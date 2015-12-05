@@ -26,6 +26,10 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+
+AUTHENTICATION_BACKENDS = ('neo4django.graph_auth.backends.NodeModelBackend',)
+AUTH_USER_MODEL = 'neo4django.graph_auth.User'
 
 # Application definition
 
@@ -36,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'neo4django.graph_auth',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,11 +60,13 @@ WSGI_APPLICATION = 'intellectualSharing.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django_mongodb_engine',
-        'NAME': 'mongodb',
-    }
+# PASSWORD is django
+NEO4J_DATABASES = {
+	'default': {
+		'HOST': 'localhost',
+		'PORT': 7474,
+		'ENDPOINT': '/db/data'
+	}	
 }
 
 # Internationalization

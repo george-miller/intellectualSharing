@@ -1,22 +1,21 @@
-from django.db import models
+from neo4django.db import models
 
 # We are essentially creating a graph where each idea/object is a Node and relationships are edges
 # I think we maybe could find a more efficient way to do this, I want to say graph databases but I don't know enough about them to know if they would work.
 
-class Node(models.Model):
-	title = models.CharField()
-	description = models.TextField()
+class Node(models.NodeModel):
+	title = models.StringProperty()
+	description = models.StringProperty()
+	edges = models.Relationship('Edge', rel_type='relationship', related_name='edges')
 	
 	def __str__(self):
 		return self.title + "  " + self.id 
 
-class Edge(models.Model):
-	# NodeFrom has a relationship (whose ObjectId=relationshipid) to NodeTo
-	nodeFrom = models.ForeignKey(Node)
-	# Points to the Node that contains info on the relationship ex 'composed of'
-	relationshipId = models.CharField()
-	nodeTo = models.CharField()
+class Edge(models.NodeModel):
+	title = models.StringProperty()
+	description = models.StringProperty()
+	nodes = models.Relationship(Node, rel_type='realtionship', related_name='nodes')
 
 	def __str__(self):
-		node = Node.objects.get(id=self.relationshipId)
-		return node.title
+		return self.title + "  " + self.id
+

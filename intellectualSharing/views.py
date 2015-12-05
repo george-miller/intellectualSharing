@@ -8,10 +8,10 @@ def insertNode(request):
 	title = request.GET.get("title")
 	description = request.GET.get("description")
 	if isinstance(title, basestring) and isinstance(description, basestring):
-		sameTitleNodes = Node.objects.filter(title=request.GET.get("title"))
-		if len(sameTitleNodes) > 0:
-			return HttpResponse("Already Nodes with this title, choose another title")
-		Node.objects.create(title=title, description=description)
+#		sameTitleNodes = Node.objects.filter(title=request.GET.get("title"))
+#		if len(sameTitleNodes) > 0:
+#			return HttpResponse("Already Nodes with this title, choose another title")
+#		Node.objects.create(title=title, description=description)
 		return HttpResponse("Successfully created Node")
 	else:
 		return HttpResponse("Invalid Arguments, title and description must be strings")
