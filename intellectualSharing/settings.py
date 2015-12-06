@@ -26,10 +26,6 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-
-AUTHENTICATION_BACKENDS = ('neo4django.graph_auth.backends.NodeModelBackend',)
-AUTH_USER_MODEL = 'neo4django.graph_auth.User'
 
 # Application definition
 
@@ -40,7 +36,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'neo4django.graph_auth',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,5 +1,5 @@
-You must install the correct db engine to make this work.  The installs can be found here:
+Install neo4django from here
 
-https://github.com/django-nonrel
+https://github.com/scholrly/neo4django
 
-Get the repo called 'django' and the one called 'mongodb-engine' and run 'sudo python setup.py install'
+Make sure you have the correct versions of Django and Neo4j (these are specified in the readme ffor the above repo)
