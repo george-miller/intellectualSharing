@@ -30,8 +30,20 @@ class Node(models.NodeModel):
 
 	def routeRelationships(self):
 		routeRels = []
-		for node in self.nodes.all():
-			routeRels.append([node, node.route(self)])
-
+		for node in self.nodes.all():	
+			thisRoute = []
+			thisRoute.append(node)
+			self.recursiveRoute(thisRoute, self, node)
+			print thisRoute
+			routeRels.append(thisRoute)
 		return routeRels
+	
+	def recursiveRoute(self, array, source, middle):
+		end = middle.route(source)
+		if isinstance(end, basestring) and end == "No routes found":
+			return array
+		else:
+			array.append(end)
+			return self.recursiveRoute(array, middle, end)
+
 
