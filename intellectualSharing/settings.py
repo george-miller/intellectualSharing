@@ -1,20 +1,6 @@
-"""
-Django settings for intellectualSharing project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
-"""
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'kat*-v=xj=cb_hf2z=-fsc0+w-3v9p*rmj4+b*33aw+24^cz&='
@@ -51,18 +37,6 @@ ROOT_URLCONF = 'intellectualSharing.urls'
 
 WSGI_APPLICATION = 'intellectualSharing.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-# PASSWORD is django
-NEO4J_DATABASES = {
-	'default': {
-		'HOST': 'localhost',
-		'PORT': 7474,
-		'ENDPOINT': '/db/data'
-	}	
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
