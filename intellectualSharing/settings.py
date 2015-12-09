@@ -55,11 +55,13 @@ WSGI_APPLICATION = 'intellectualSharing.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django_mongodb_engine',
-        'NAME': 'mongodb',
-    }
+# PASSWORD is django
+NEO4J_DATABASES = {
+	'default': {
+		'HOST': 'localhost',
+		'PORT': 7474,
+		'ENDPOINT': '/db/data'
+	}	
 }
 
 # Internationalization
