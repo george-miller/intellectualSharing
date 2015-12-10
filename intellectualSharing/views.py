@@ -1,14 +1,11 @@
 from django.http import HttpResponse
 import db
 
-#def findNode(request, nodeTitle):
-
-	
 def home(request):
-	return HttpResponse("heelo")
+	return HttpResponse("Welcome to intellectualSharing API!")
 
 def addNode(request):
-	typeNode = db.getNode("__" + request.POST.get('typeName'))
+	typeNode = db.getCentralType("__" + request.POST.get('typeName'))
 	if typeNode != None:
 		name = request.POST.get('name')
 		description = request.POST.get('description')
@@ -18,7 +15,7 @@ def addNode(request):
 		else:
 			return HttpResponse("name and description must be strings")
 	else:
-		return HttpResponse("Type node not found " + typeNode)
+		return HttpResponse("Type node not found " + typeNode + ".  Would you like to add it to the meta?")
 			
 #def addPropertyToNode(request):
 
