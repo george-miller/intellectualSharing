@@ -8,7 +8,6 @@ SECRET_KEY = 'kat*-v=xj=cb_hf2z=-fsc0+w-3v9p*rmj4+b*33aw+24^cz&='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -55,3 +54,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+		'OPTIONS': {
+			'django.contrib.auth.context_processors.auth'
+		}
+    },
+]
