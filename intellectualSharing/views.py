@@ -5,12 +5,11 @@ import db
 
 	
 def home(request):
-	print request.POST.getlist('a')
 	return HttpResponse("heelo")
 
 def addNode(request):
-	result = attemptTypeSearch(request.POST.get('typeName'))
-	if result == True:
+	typeNode = db.getNode("__" + request.POST.get('typeName'))
+	if typeNode != None:
 		name = request.POST.get('name')
 		description = request.POST.get('description')
 		if isinstance(description, basestring) and isinstance(name, basestring):
@@ -19,30 +18,23 @@ def addNode(request):
 		else:
 			return HttpResponse("name and description must be strings")
 	else:
-		return result
+		return HttpResponse("Type node not found " + typeNode)
 			
-def attemptTypeSearch(typeName):
-	if not isinstance(typeName, basestring):
-		return HttpResponse("Type name must be a string")
-	if db.isDefinedType(typeName):
-		return True
-	else:
-		# Send to page to create type node
-		return HttpResponse("Type " + typeName + " is undefined.  Define it first")
-
 #def addPropertyToNode(request):
-	
-	
-	
 
 def addRelationshipToNodes(request):
-	nodeTo = db.getNode(request.POST.get('nodeToLabel'), request.POST.get('nodeToName'))
-	nodeFrom = db.getNode(request.POST.get('nodeFromLabel'), request.POST.get('nodeFromName'))
+	nodeTo = db.getNode(request.POST.get('nodeToType'), request.POST.get('nodeToName'))
+	nodeFrom = db.getNode(request.POST.get('nodeFromType'), request.POST.get('nodeFromName'))
 	if nodeTo != None and nodeFrom != None:
 		relationshipName = request.POST.get('relationshipName')
 		if isinstance(relationshipName, basestring):
-			db.createRelationship(nodeFrom, relationshipName, nodeTo)
-			return HttpResponse("Relationship created successfully")
+			if db.isRelationshipOnTypeNode(relationshipName, request.POST.get('nodeFromType'), request.POST.get('nodeToType')):
+				db.createRelationship(nodeFrom, relationshipName, nodeTo)
+				return HttpResponse("Relationship created successfully")
+			else:
+				# What do we do if the relationship wasn't on the type node?
+				return HttpResponse("Relationship wasn't on central typeNode, would you like to add it to the meta?")
+
 		else:
 			return HttpResponse("relationshipName must be a string")
 	
@@ -51,8 +43,3 @@ def addRelationshipToNodes(request):
 
 
 
-def areElementsString(array):
-	for thing in array:
-		if not isinstance(thing, basestring):
-			return False
-	return True
