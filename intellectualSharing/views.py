@@ -5,7 +5,13 @@ def home(request):
 	return HttpResponse("Welcome to intellectualSharing API!")
 
 def addNode(request):
-	typeNode = db.getCentralType("__" + request.POST.get('typeName'))
+	typeName = request.POST.get('typeName')
+	if not isinstance(typeName, basestring):
+		return HttpResponse("Typename must be a string")
+	if typeName[:2] == db.centralPrefix:
+		return HttpResponse("You may not create a central node form this API")
+
+	typeNode = db.getCentralType(db.centralPrefix + request.POST.get('typeName'))
 	if typeNode != None:
 		name = request.POST.get('name')
 		description = request.POST.get('description')

@@ -2,11 +2,12 @@ from py2neo import *
 
 authenticate('localhost:7474', 'neo4j', 'django')
 g = Graph()
+centralPrefix = "__"
 
 # Wrapping py2neo to give a domain-specific interface for our application
 
 def getCentralType(typeName):
-	t = g.find_one("__" + typeName)
+	t = g.find_one(centralPrefix + typeName)
 	return t
 	
 def createNode(typeName, name, description):
@@ -44,7 +45,7 @@ def isRelationshipOnTypeNode(relationship, nodeFromType, nodeToType):
 				return "Error multiple relationships on typeNode with same name"
 		# Search in the endNode of r for a label that matches toType
 		for label in r.nodes[1].labels:
-			if label == ("__" + nodeToType):
+			if label == (centralPrefix + nodeToType):
 				return True
 
 		# NodeToType didn't match the one on the central type node
