@@ -1,6 +1,6 @@
 from py2neo import *
 
-authenticate('localhost:7474', 'neo4j', 'george')
+authenticate('localhost:7474', 'neo4j', 'django')
 g = Graph()
 g.delete_all()
 

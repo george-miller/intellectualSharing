@@ -1,52 +1,58 @@
 from django.http import HttpResponse
-from .models import Node, Route
+import db
 
-def findNode(request, nodeTitle):
-	possibleNodes = Node.objects.filter(title=nodeTitle)
-	if possibleNodes.count() < 1:
-		return HttpResponse("Couldn't find node with name " + str(nodeTitle))
-	elif possibleNodes.count() == 1:
-		return possibleNodes[0]
-	else:
-		return HttpResponse("Multiple Nodes found with name " + str(nodeTitle))
+#def findNode(request, nodeTitle):
+
 	
 def home(request):
-	return HttpResponse("Hello!")
+	print request.POST.getlist('a')
+	return HttpResponse("heelo")
 
-def insertNode(request):
-	title = request.GET.get("title")
-	description = request.GET.get("description")
-	if isinstance(title, basestring) and isinstance(description, basestring):
-		sameTitleNodes = Node.objects.filter(title=request.GET.get("title"))
-		if len(sameTitleNodes) > 0:
-			return HttpResponse("Already Nodes with this title, choose another title")
-		Node.objects.create(title=title, description=description)
-		return HttpResponse("Successfully created Node")
+def addNode(request):
+	result = attemptTypeSearch(request.POST.get('typeName'))
+	if result == True:
+		name = request.POST.get('name')
+		description = request.POST.get('description')
+		if isinstance(description, basestring) and isinstance(name, basestring):
+			db.createNode(typeName, name, description)
+			return HttpResponse("Node created")
+		else:
+			return HttpResponse("name and description must be strings")
 	else:
-		return HttpResponse("Invalid Arguments, title and description must be strings")
-
-
-def connectNodes(request):
-	nodeFrom = request.GET.get('nodeFrom')
-	nodeTo = request.GET.get('nodeTo')
-	relationship = request.GET.get('relationship')
-	if isinstance(nodeFrom, basestring) and isinstance(nodeTo, basestring) and isinstance(relationship, basestring):
-		nodeFrom = findNode(request, nodeFrom)
-		nodeTo = findNode(request, nodeTo)
-		relationship = findNode(request, relationship)
-		nodeFrom.nodes.add(relationship)
-		r = Route.objects.create(nodeFrom=nodeFrom.id, nodeTo=nodeTo)
-		relationship.routes.add(r)
-		return HttpResponse("Nodes successfully connected")
+		return result
+			
+def attemptTypeSearch(typeName):
+	if not isinstance(typeName, basestring):
+		return HttpResponse("Type name must be a string")
+	if db.isDefinedType(typeName):
+		return True
 	else:
-		return HttpResponse("Invalid Arguments: nodeFrom, nodeTo, and relationship must all be strings")
+		# Send to page to create type node
+		return HttpResponse("Type " + typeName + " is undefined.  Define it first")
 
-def getRouteRelationships(request):
-	title = request.GET.get('title')
-	if isinstance(title, basestring):
-		node = findNode(request, title)
-		routeRelationships = node.routeRelationships()
-		return HttpResponse(str(len(routeRelationships)))
+#def addPropertyToNode(request):
+	
+	
+	
 
+def addRelationshipToNodes(request):
+	nodeTo = db.getNode(request.POST.get('nodeToLabel'), request.POST.get('nodeToName'))
+	nodeFrom = db.getNode(request.POST.get('nodeFromLabel'), request.POST.get('nodeFromName'))
+	if nodeTo != None and nodeFrom != None:
+		relationshipName = request.POST.get('relationshipName')
+		if isinstance(relationshipName, basestring):
+			db.createRelationship(nodeFrom, relationshipName, nodeTo)
+			return HttpResponse("Relationship created successfully")
+		else:
+			return HttpResponse("relationshipName must be a string")
+	
 	else:
-		return HttpResponse('Invalid Arguments: title must be a string')
+		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
+
+
+
+def areElementsString(array):
+	for thing in array:
+		if not isinstance(thing, basestring):
+			return False
+	return True
