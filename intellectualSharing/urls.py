@@ -8,5 +8,6 @@ urlpatterns = patterns('',
     url(r'^$', 'intellectualSharing.views.home', name='home'),
     url(r'^addNode', 'intellectualSharing.views.addNode', name='addNode'),
 	url(r'^addRelationship', 'intellectualSharing.views.addRelationshipToNodes', name="addRelationship"),
+	url(r'^viewNode', 'intellectualSharing.views.viewNode', name='viewNode'),
     url(r'^admin/', include(admin.site.urls)),
 )

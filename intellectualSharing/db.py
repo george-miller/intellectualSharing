@@ -19,18 +19,18 @@ def createRelationship(nodeFrom, relationship, nodeTo):
 	rel = Relationship(nodeFrom, relationship, nodeTo)
 	g.create(rel)
 
-def getNode(label, name):
-	if isinstance(label, basestring) and isinstance(name, basestring):
-		result = g.cypher.execute("MATCH (n:" + label + " {name:'" + name + "'}) RETURN n")
+def getNode(nodeType, name):
+	if areElementsString([nodeType, name]):
+		result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
 		order = result.to_subgraph().order
 		if order == 0:
 			return None
 		elif order == 1:
 			return result[0][0]
 		else:
-			return "Error multiple nodes found with name " + name + " and label " + label
+			return "Error multiple nodes found with name " + name + " and label " + nodeType
 	else:
-		return "label and name must be strings"
+		return "type and name must be strings"
 
 def isRelationshipOnTypeNode(relationship, nodeFromType, nodeToType):
 	fromType = getCentralType(nodeFromType)
@@ -54,3 +54,8 @@ def isRelationshipOnTypeNode(relationship, nodeFromType, nodeToType):
 	else:
 		return False
 		
+def areElementsString(array):
+	for i in array:
+		if not isinstance(i, basestring):
+			return False
+	return True

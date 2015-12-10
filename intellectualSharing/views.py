@@ -44,5 +44,11 @@ def addRelationshipToNodes(request):
 	else:
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
-
+def viewNode(request):
+	node = db.getNode(request.GET.get('type'), request.GET.get('name'))
+	if node != None:
+		# render a page, giving the page the node object to use
+		return HttpResponse(str(node))
+	else:
+		return HttpResponse("nodeTitle and nodeName must be strings" + str(node))
 
