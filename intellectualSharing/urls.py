@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^addNode', views.addNode, name='addNode'),
 	url(r'^addRelationship', views.addRelationshipToNodes, name="addRelationship"),
+	url(r'^addPropertyToNode', views.addPropertyToNode, name='addPropertyToNode'),
 	url(r'^viewNode', views.viewNode, name='viewNode'),
     url(r'^admin/', include(admin.site.urls)),
 ]

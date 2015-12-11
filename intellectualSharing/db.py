@@ -2,13 +2,19 @@ from py2neo import *
 
 authenticate('localhost:7474', 'neo4j', 'django')
 g = Graph()
-centralPrefix = "__"
 
 # Wrapping py2neo to give a domain-specific interface for our application
 
 def getCentralType(typeName):
-	t = g.find_one(centralPrefix + typeName)
-	return t
+	result = g.cypher.execute("MATCH (n:TypeNode {name:'" + typeName + "'}) RETURN n")
+	order = result.to_subgraph().order
+	if order == 0:
+		return None
+	elif order == 1:
+		return result[0][0]
+	else:
+		print "Error multiple nodes found when searching typeName " + typeName
+		return "Error multiple nodes found when searching typeName " + typeName
 	
 def createNode(typeName, name, description):
 	node = Node(typeName, name=name, description=description)
@@ -20,42 +26,30 @@ def createRelationship(nodeFrom, relationship, nodeTo):
 	g.create(rel)
 
 def getNode(nodeType, name):
-	if areElementsString([nodeType, name]):
-		result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
-		order = result.to_subgraph().order
-		if order == 0:
-			return None
-		elif order == 1:
-			return result[0][0]
-		else:
-			return "Error multiple nodes found with name " + name + " and label " + nodeType
-	else:
-		return "type and name must be strings"
+	result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
+	order = result.to_subgraph().order
+	if order == 1:
+		return result[0][0]
+	elif order > 1:
+		print "Error multiple nodes found for nodeType " + nodeType + " and name " + name
+	return None
+	
+def getCentralRelationshipName(fromType, toType):
+	for rel in fromType.match("HAS_RELATIONSHIP"):
+		if rel['nameOfRelated'] == toType['name']:
+			return rel['nameOfRelated']
+	return None
 
 def isRelationshipOnTypeNode(relationship, nodeFromType, nodeToType):
 	fromType = getCentralType(nodeFromType)
 	toType = getCentralType(nodeToType)
 	if (fromType != None and toType != None):
-		rels = fromType.match(relationship)
-		r = None
-		for rel in rels:
-			if r == None:
-				r = rel
-			else:
-				return "Error multiple relationships on typeNode with same name"
-		# Search in the endNode of r for a label that matches toType
-		for label in r.nodes[1].labels:
-			if label == (centralPrefix + nodeToType):
-				return True
+		relName = getCentralRelationshipName(fromType, toType)
+		if relationship == relName:
+			return True
+	return False
 
-		# NodeToType didn't match the one on the central type node
-		return False
+#def createTypeNode():
 
-	else:
-		return False
+#def createRelationshipType():
 		
-def areElementsString(array):
-	for i in array:
-		if not isinstance(i, basestring):
-			return False
-	return True

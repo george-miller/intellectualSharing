@@ -4,11 +4,12 @@ import db
 def home(request):
 	return HttpResponse("Welcome to intellectualSharing API!")
 
+# POST data must contain 'typeName', 'name', and 'description'
 def addNode(request):
 	typeName = request.POST.get('typeName')
 	if not isinstance(typeName, basestring):
 		return HttpResponse("Typename must be a string")
-	if typeName[:2] == db.centralPrefix:
+	if typeName == 'TypeNode':
 		return HttpResponse("You may not create a central node form this API")
 
 	typeNode = db.getCentralType(db.centralPrefix + request.POST.get('typeName'))
@@ -23,9 +24,29 @@ def addNode(request):
 	else:
 		return HttpResponse("Type node not found " + typeNode + ".  Would you like to add it to the meta?")
 			
-#def addPropertyToNode(request):
+def addPropertyToNode(request):
+	nodeType = request.POST.get('type')
+	name = request.POST.get('name')
+	propName = request.POST.get('propName')
+	propValue = request.POST.get('propValue')
+	if areElementsString(nodeType, name, propName):
+		node = db.getNode(nodeType, name)
+		if node == None:
+			return HttpResponse('No node found')
+		else:
+			node[propName] = propValue
+			node.push()
+			return HttpResponse('Property Added Sucessfully')
+	else:
+		return HttpResponse("type, name, and propName must be strings")
 
+# POST data must contain 'nodeToType', 'nodeToName',
+# 'nodeFromType', 'nodeFromName', relationshipName
 def addRelationshipToNodes(request):
+	if not areElementsString(request.POST.get('nodeToType'), 
+		request.POST.get('nodeToName'), request.POST.get('nodeFromType'), 
+		request.POST.get('nodeFromName')):
+		return HttpResponse('nodeToType, nodeToName, nodeFromType, nodeFromName must be strings')
 	nodeTo = db.getNode(request.POST.get('nodeToType'), request.POST.get('nodeToName'))
 	nodeFrom = db.getNode(request.POST.get('nodeFromType'), request.POST.get('nodeFromName'))
 	if nodeTo != None and nodeFrom != None:
@@ -45,6 +66,9 @@ def addRelationshipToNodes(request):
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
 def viewNode(request):
+	if not areElementsString(request.GET.get('type'), request.GET.get('name')):
+		return HttpResponse("type and name must be strings")
+
 	node = db.getNode(request.GET.get('type'), request.GET.get('name'))
 	if node != None:
 		# render a page, giving the page the node object to use
@@ -52,3 +76,14 @@ def viewNode(request):
 	else:
 		return HttpResponse("nodeTitle and nodeName must be strings" + str(node))
 
+
+#def defineTypeNode(request):
+	
+
+
+
+def areElementsString(*args):
+	for i in args:
+		if not isinstance(i, basestring):
+			return False
+	return True
