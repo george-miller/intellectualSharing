@@ -1,8 +1,9 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 import db
 
 def home(request):
-	return HttpResponse("Welcome to intellectualSharing API!")
+	return HttpResponse("Welcome to the Intellectual Sharing API!")
 
 # POST data must contain 'typeName', 'name', and 'description'
 def addNode(request):

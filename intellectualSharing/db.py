@@ -1,7 +1,7 @@
 from py2neo import *
 
-authenticate('localhost:7474', 'neo4j', 'django')
-g = Graph()
+g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
+
 
 # Wrapping py2neo to give a domain-specific interface for our application
 
