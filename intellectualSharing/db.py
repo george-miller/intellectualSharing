@@ -37,7 +37,7 @@ def getNode(nodeType, name):
 def getCentralRelationshipName(fromType, toType):
 	for rel in fromType.match("HAS_RELATIONSHIP"):
 		if rel['nameOfRelated'] == toType['name']:
-			return rel['nameOfRelated']
+			return rel.end_node['name']
 	return None
 
 def isRelationshipOnTypeNode(relationship, nodeFromType, nodeToType):
