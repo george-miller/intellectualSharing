@@ -6,34 +6,44 @@ from py2neo import *
 from intellectualSharing import db
 import unittest
 
-db.g = Graph('http://neo4j:django@127.0.0.1:7475/db/data')
+db.g = Graph('http://neo4j:django@127.0.0.1:7474/db/data')
 db.g.delete_all()
 	
+# TERMINOLOGY
+# TypeNode - Node in the meta that centralizes the defenition of a signular idea (ex. object, place, person)
+# RelationshipType - Node in the meta that centralizes the defenition of a singular relationship between TypeNodes
 
-TypeActor = Node("TypeNode", name='actor')
-TypeRole = Node("TypeNode", name='role')
-RelHadRole = Node("RelationshipType", name='HAD_ROLE')
-actorToHadRole = Relationship(TypeActor, "HAS_RELATIONSHIP", RelHadRole)
-actorToHadRole['nameOfRelated'] = 'role'
-HadRoleToRole = Relationship(RelHadRole, 'HAS_RELATIONSHIP', TypeRole)
+#CREATE META
+TypeActor = db.createTypeNode('actor')
+TypeRole = db.createTypeNode('role')
+TypeMovie = db.createTypeNode('movie')
+TypeGenre = db.createTypeNode('genre')
+TypeCharacter = db.createTypeNode('character')
+TypeAward = db.createTypeNode('award')
+RelHadRole = db.createRelationshipType('actor', 'HAD_ROLE', 'role')
+RelInProductionOf = db.createRelationshipType('role', 'IN_PRODUCTION_OF', 'movie')
+RelHasGenre = db.createRelationshipType('movie', 'HAS_GENRE', 'genre')
+RelPlayed = db.createRelationshipType('role', 'PLAYED', 'character')
+RelActorAwarded = db.createRelationshipType('actor', 'AWARDED', 'award')
+RelMovieAwarded = db.createRelationshipType('movie', 'AWARDED', 'award')
 
-actor = Node("actor", name='Daniel Craig')
-role = Node("role", name="Daniel Craig")
-character = Node("character", name='James Bond')
-movie = Node("movie", name="Skyfall")
+#CREATE instance of meta
+actor = db.createNode('actor', 'Daniel Craig', "He has blue eyes and blond hair")
+role = db.createNode("role", "Daniel Craig", "Daniel Craig played a role")
+character = db.createNode("character", 'James Bond', "A british mi6 spy who fights evil across the world!  He also gets tons of ridiculously hot girls")
+movie = db.createNode("movie", "Skyfall", "This movie is about James Bond's return to his old home.")
 
-actorHasRole = Relationship(actor, "HAD_ROLE", role)
-rolePlayed = Relationship(role, "PLAYED", character)
-roleProduction = Relationship(role, "IN_PRODUCTION_OF", movie)
+actorHasRole = db.createRelationship(actor, "HAD_ROLE", role)
+rolePlayed = db.createRelationship(role, "PLAYED", character)
+roleProduction = db.createRelationship(role, "IN_PRODUCTION_OF", movie)
 
-db.g.create(actor, role, character, movie, actorHasRole, rolePlayed, roleProduction, 
-	TypeActor, TypeRole, RelHadRole, actorToHadRole, HadRoleToRole)
+db.g.create(actor, role, character, movie, actorHasRole, rolePlayed, roleProduction)
 
 class TestDbApi(unittest.TestCase):
 	
-	def testGetCentralType(self):
-		self.assertEqual(db.getCentralType('actor'), TypeActor)
-		self.assertEqual(db.getCentralType('role'), TypeRole)
+	def testGetTypeNode(self):
+		self.assertEqual(db.getTypeNode('actor'), TypeActor)
+		self.assertEqual(db.getTypeNode('role'), TypeRole)
 	
 	def testGetNode(self):
 		self.assertEqual(db.getNode('actor', 'Daniel Craig'), actor)
