@@ -66,16 +66,15 @@ def addRelationshipToNodes(request):
 	else:
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
-def viewNode(request):
-	if not areElementsString(request.GET.get('type'), request.GET.get('name')):
-		return HttpResponse("type and name must be strings")
+def viewNode(request, label, name):
+    if not areElementsString(request.GET.get('type'), request.GET.get('name')):
+        return HttpResponse("type and name must be strings")
 
-	node = db.getNode(request.GET.get('type'), request.GET.get('name'))
-	if node != None:
-		# render a page, giving the page the node object to use
-		return HttpResponse(str(node))
-	else:
-		return HttpResponse("nodeTitle and nodeName must be strings" + str(node))
+    node = db.getNode(label, name)
+    if node != None:
+        return render(request, 'node.html', {"node": node})
+    else:
+        return HttpResponse('Node not found.')
 
 
 #def defineTypeNode(request):
@@ -88,3 +87,4 @@ def areElementsString(*args):
 		if not isinstance(i, basestring):
 			return False
 	return True
+
