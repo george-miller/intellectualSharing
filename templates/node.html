@@ -18,6 +18,23 @@
 
 {% block script %}
 <script>
+    var JSONDATA = {};
+
+    var config = {
+        dataSource: JSONDATA,
+        graphHeight: 260,
+        graphWidth: 300,
+
+        linkDistance: function(){ return 40; },
+
+        nodeTypes: {"node_type": ["Maintainer", "Contributor"]},
+        caption: function(node){ return node.caption; }
+    };
+
+    $(document).ready(function(){
+        alchemy = new Alchemy(config);
+    });
+  </script>
 
 </script>
 {% endblock %}
