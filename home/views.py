@@ -2,6 +2,9 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import db
 
+#TODO Make node visualization html pages and make connections
+#TODO Edit worldfromscratch
+
 def home(request):
 	return HttpResponse("Welcome to the Intellectual Sharing API!")
 
@@ -57,6 +60,7 @@ def addRelationshipToNodes(request):
 				db.createRelationship(nodeFrom, relationshipName, nodeTo)
 				return HttpResponse("Relationship created successfully")
 			else:
+				# TODO make render page
 				# What do we do if the relationship wasn't on the type node?
 				return HttpResponse("Relationship wasn't on central typeNode, would you like to add it to the meta?")
 
@@ -67,9 +71,6 @@ def addRelationshipToNodes(request):
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
 def viewNode(request, label, name):
-    if not areElementsString(request.GET.get('type'), request.GET.get('name')):
-        return HttpResponse("type and name must be strings")
-
     node = db.getNode(label, name)
     if node != None:
         return render(request, 'node.html', {"node": node})

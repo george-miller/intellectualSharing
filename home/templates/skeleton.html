@@ -17,8 +17,6 @@
     <link rel="stylesheet" href="{{ex_static}}/alchemy/styles/vendor.css"/>
     <link rel="stylesheet" href="{{ex_static}}/alchemy/alchemy.css"/>
 
-</body>
-</html>
 
     <style>
     </style>
@@ -36,6 +34,22 @@
 </div>
 
 <div>
+</div>
+
+<div class='cover'>
+    <div class="cover-outer" onclick="closeCover()"></div>
+
+    <div class='cover-inner'>
+        <div class='cover-content'>
+        </div>
+        <div class="close" onclick="closeCover()"><span class="glyphicon glyphicon-remove"></span></div>
+        {% csrf_token %}
+    </div>
+
+</div>
+
+</body>
+
     <!-- Latest compiled and minified JavaScript -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
@@ -55,21 +69,7 @@
             {% endif %}
         });
 
+	</script>
     {% block script %}
     {% endblock %}
-</div>
-
-<div class='cover'>
-    <div class="cover-outer" onclick="closeCover()"></div>
-
-    <div class='cover-inner'>
-        <div class='cover-content'>
-        </div>
-        <div class="close" onclick="closeCover()"><span class="glyphicon glyphicon-remove"></span></div>
-        {% csrf_token %}
-    </div>
-
-</div>
-
-</body>
 </html>

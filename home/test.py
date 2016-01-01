@@ -3,7 +3,7 @@
 # you must change the HTTPS port to something that's not 7473
 
 from py2neo import *
-from intellectualSharing import db
+import db
 import unittest
 
 db.g = Graph('http://neo4j:django@127.0.0.1:7474/db/data')
