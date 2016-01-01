@@ -22,8 +22,8 @@
 
     var config = {
         dataSource: JSONDATA,
-        graphHeight: 260,
-        graphWidth: 300,
+        graphHeight: function(){ return 260; },
+        graphWidth: function(){ return 300; },
 
         linkDistance: function(){ return 40; },
 

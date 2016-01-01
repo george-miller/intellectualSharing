@@ -12,14 +12,12 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="{{ex_static}}style.css{{v}}" />
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
 
-    <link rel="stylesheet" href="{{ex_static}}/alchemy/styles/vendor.css"/>
-    <link rel="stylesheet" href="{{ex_static}}/alchemy/alchemy.css"/>
+    <link rel="stylesheet" href="{% static 'alchemy/styles/vendor.css' %}"/>
+    <link rel="stylesheet" href="{% static 'alchemy/alchemy.css' %}"/>
 
-
-    <style>
-    </style>
     {% block style %}
     {% endblock %}
     <script>var GLOBAL = {};</script>
@@ -33,8 +31,6 @@
     {% endblock %}
 </div>
 
-<div>
-</div>
 
 <div class='cover'>
     <div class="cover-outer" onclick="closeCover()"></div>
@@ -47,16 +43,14 @@
     </div>
 
 </div>
-
-</body>
-
-    <!-- Latest compiled and minified JavaScript -->
+<div id='#alchemy'></div>
+<!-- Latest compiled and minified JavaScript -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="{{ex_static}}/alchemy/scripts/vendor.js"></script>
-    <script src="{{ex_static}}/alchemy/alchemy.js"></script>
-    <script src="{{ex_static}}script.js{{v}}"></script>
+    <script src="{% static 'alchemy/scripts/vendor.js' %}"></script>
+    <script src="{% static 'alchemy/alchemy.js' %}"></script>
+    <script src="{% static 'script.js' %}"></script>
 
     <script>
         var CSRF = '{{ csrf_token }}';
@@ -69,7 +63,11 @@
             {% endif %}
         });
 
-	</script>
+    </script>
     {% block script %}
     {% endblock %}
+
+</body>
+
+    
 </html>
