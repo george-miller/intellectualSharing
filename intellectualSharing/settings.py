@@ -14,7 +14,9 @@ TEMPLATES = [
         'APP_DIRS': True,
 		'DIRS' : [os.path.join(BASE_DIR, 'templates')],
 		'OPTIONS': {
-			'django.contrib.auth.context_processors.auth',
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+            ],
 		},
     },
 ]
