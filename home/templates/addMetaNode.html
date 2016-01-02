@@ -1,0 +1,37 @@
+{% extends "skeleton.html" %}
+
+{% block style %}
+<style type="text/css" media="screen">
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'header.html' %}
+
+{{error}}
+
+<form action="addMetaNode" method="post">
+<input type="text" name="typeName" placeholder="New Type Name">
+<br/><br/>
+<input type="checkbox" name="hasRelationship" value="hasRelationship">Add a relationship to this TypeNode <br/>
+<select name="relName">
+{% for rel in rels %}
+<option value="{{rel}}">{{rel}}</option>
+{% endfor %}
+</select>
+<br/><br/>
+<select name="relatedType">
+{% for type in types %}
+<option value="{{type}}">{{type}}</option>
+{% endfor %}
+</select>
+<br/><br/>
+<input type="submit">
+<form>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}
