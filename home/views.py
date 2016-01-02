@@ -71,11 +71,24 @@ def addRelationshipToNodes(request):
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
 def addMetaNode(request):
+    rels = db.getRelationshipNames()
+    types = db.getTypeNames()
     if request.method == 'POST':
-        return HttpResponse("post!")
+        newType = request.POST.get('typeName')
+        hasRel = request.POST.get('hasRelationship')
+        if newType != "":
+            db.createTypeNode(newType)
+            result = newType + " Node created successfully!"
+        else:
+            result = "Node must have a name"
+        if (hasRel != None):
+            relName = request.POST.get('relName')
+            relatedType = request.POST.get('relatedType')
+            result = db.connectTypeNodes(newType, relName, relatedType)
+
+        return render(request, 'addMetaNode.html', 
+            {"rels":rels, "types":types, "error":result})
     else:
-        rels = db.getRelationshipNames()
-        types = db.getTypeNames()
         return render(request, 'addMetaNode.html', {"rels":rels, "types":types})
 
 def viewNode(request, label, name):
@@ -84,8 +97,6 @@ def viewNode(request, label, name):
         return render(request, 'node.html', {"node": node})
     else:
         return HttpResponse('Node not found.')
-
-
 
 def areElementsString(*args):
 	for i in args:

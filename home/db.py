@@ -78,6 +78,20 @@ def createRelationshipType(nodeFromName, relationshipName, nodeToName):
 		return relType
 	else:
 		return "Either couldn't find fromType: " + fromType + " or toType: " + toType
+
+def connectTypeNodes(typeFrom, relName, typeTo):
+    typeFrom = getTypeNode(typeFrom)
+    typeTo = getTypeNode(typeTo)
+    relType = getRelationshipType(relName)
+    if (typeFrom != None and typeTo != None and relType != None):
+        fromToRel = Relationship(typeFrom, "HAS_RELATIONSHIP", relType)
+        fromToRel['nameOfRelated'] = typeTo['name']
+        relToTo = Relationship(relType, "HAS_RELATIONSHIP", typeTo)
+        g.create(relType, fromToRel, relToTo)
+        return "Relationship created successfully!"
+
+    else:
+        return "Type or relationship not found: typeFrom - " + typeFrom + " typeTo - " + typeTo + " relType - " + relType
 	
 def getRelationshipNames():
     result = g.cypher.execute("MATCH (n:RelationshipType) RETURN n")
