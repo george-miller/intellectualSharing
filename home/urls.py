@@ -13,4 +13,5 @@ urlpatterns = [
 
     #Node Lookup URL with label and id variables
 	url(r'^viewNode/(?P<label>[\w| ]+)/(?P<name>[\w| ]+)/', views.viewNode, name='viewNode'),
+    url(r'^addMetaNode', views.addMetaNode, name='addMetaNode'),
 ]

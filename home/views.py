@@ -70,16 +70,20 @@ def addRelationshipToNodes(request):
 	else:
 		return HttpResponse("Nodes couldn't be found" + str(nodeTo) + str(nodeFrom))
 
+def addMetaNode(request):
+    if request.method == 'POST':
+        return HttpResponse("post!")
+    else:
+        rels = db.getRelationshipNames()
+        types = db.getTypeNames()
+        return render(request, 'addMetaNode.html', {"rels":rels, "types":types})
+
 def viewNode(request, label, name):
     node = db.getNode(label, name)
     if node != None:
         return render(request, 'node.html', {"node": node})
     else:
         return HttpResponse('Node not found.')
-
-
-#def defineTypeNode(request):
-	
 
 
 

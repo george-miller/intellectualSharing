@@ -79,4 +79,17 @@ def createRelationshipType(nodeFromName, relationshipName, nodeToName):
 	else:
 		return "Either couldn't find fromType: " + fromType + " or toType: " + toType
 	
+def getRelationshipNames():
+    result = g.cypher.execute("MATCH (n:RelationshipType) RETURN n")
+    relNames = []
+    for rel in result:
+        relNames.append(rel.n["name"])
+    return relNames
+
+def getTypeNames():
+    result = g.cypher.execute("MATCH (n:TypeNode) RETURN n")
+    typeNames = []
+    for n in result:
+        typeNames.append(n.n['name'])
+    return typeNames
 
