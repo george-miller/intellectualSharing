@@ -2,11 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import db
 
-#TODO Make node visualization html pages and make connections
+#TODO Allow creation of typeTo, rel, typeFrom simulataniously also with arbitrary number of relationships
 #TODO Edit worldfromscratch
 
 def home(request):
-	return HttpResponse("Welcome to the Intellectual Sharing API!")
+    return render(request, 'index.html')
 
 # POST data must contain 'typeName', 'name', and 'description'
 def addNode(request):
@@ -74,20 +74,33 @@ def addMetaNode(request):
     rels = db.getRelationshipNames()
     types = db.getTypeNames()
     if request.method == 'POST':
-        newType = request.POST.get('typeName')
-        hasRel = request.POST.get('hasRelationship')
-        if newType != "":
-            db.createTypeNode(newType)
-            result = newType + " Node created successfully!"
+        newTypeName = request.POST.get('typeName')
+        numberOfRels = int(request.POST.get('numberOfRels'))
+        if newTypeName != "":
+            # if a type already exists that's fine, maybe we want to add relatinships to it
+            if db.getTypeNode(newTypeName) == None:
+                db.createTypeNode(newTypeName)
         else:
-            result = "Node must have a name"
-        if (hasRel != None):
-            relName = request.POST.get('relName')
-            relatedType = request.POST.get('relatedType')
-            result = db.connectTypeNodes(newType, relName, relatedType)
+            return render(request, 'addMetaNode.html', 
+                {"rels":rels, "types":types, "error":"Node must have a name"})
+
+        if numberOfRels == 0:
+            return render(request, 'addMetaNode.html', 
+                {"rels":rels, "types":types, "error":"Node created successfully!"})
+        for i in range(numberOfRels):
+            relName = request.POST.get('rel'+str(i))
+            typeName = request.POST.get('type'+str(i))
+            typeNode = db.getTypeNode(typeName)
+            if typeNode == None:
+                db.createTypeNode(typeName)
+            relType = db.getRelationshipType(relName)
+            if relType == None:
+                db.createRelationshipType(newTypeName, relName, typeName)
+            else:
+                db.connectTypeNodes(newTypeName, relName, typeName)
 
         return render(request, 'addMetaNode.html', 
-            {"rels":rels, "types":types, "error":result})
+            {"rels":rels, "types":types, "error":"Nodes and Relationships created successfully!"})
     else:
         return render(request, 'addMetaNode.html', {"rels":rels, "types":types})
 
@@ -100,7 +113,7 @@ def viewNode(request, label, name):
 
 def areElementsString(*args):
 	for i in args:
-		if not isinstance(i, basestring):
+		if not str(i).isalpha():
 			return False
 	return True
 

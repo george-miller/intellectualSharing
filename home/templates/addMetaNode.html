@@ -12,26 +12,58 @@
 
 {{error}}
 
+{% load get_range %}
+
 <form action="addMetaNode" method="post">
-<input type="text" name="typeName" placeholder="New Type Name">
+<datalist id='relList'>
+    {% for rel in rels %}
+    <option value="{{rel}}">{{rel}}</option>
+    {% endfor %}
+</datalist>
+
+<datalist id='typeList'>
+    {% for type in types %}
+    <option value="{{type}}">{{type}}</option>
+    {% endfor %}
+</datalist>
+
+<br/>
+<input type="text" name="typeName" placeholder="New Type Name" list='typeList'>
 <br/><br/>
-<input type="checkbox" name="hasRelationship" value="hasRelationship">Add a relationship to this TypeNode <br/>
-<select name="relName">
-{% for rel in rels %}
-<option value="{{rel}}">{{rel}}</option>
-{% endfor %}
+<p>Specify the number of relationships you would like to add: </p>
+<select id="numRels" name="numberOfRels">
+    {% for i in 11|get_range %}
+    <option value="{{i}}">{{i}}</option>
+    {% endfor %}
 </select>
 <br/><br/>
-<select name="relatedType">
-{% for type in types %}
-<option value="{{type}}">{{type}}</option>
-{% endfor %}
-</select>
-<br/><br/>
+
+<div id="relBlock">
+</div>
 <input type="submit">
+<br/><br/>
 <form>
 
 {% endblock %}
 
 {% block script %}
+<script>
+
+var getHtmlInputs = function(count){
+    return "Relationship Name: <input type='text' name='rel"+ count +"' list='relList'><br/>" + 
+    "Related To Type Name: <input type='text' name='type"+ count +"' list='typeList'><br/>";
+}
+
+$(document).ready(function(){
+    numRels = $("#numRels");
+    relBlock = $("#relBlock");
+    numRels.change(function(){
+        relBlock.empty();
+        for (i = 0; i < numRels.val(); i++){
+            relBlock.append(getHtmlInputs(i));
+        }
+    });
+});
+
+</script>
 {% endblock %}

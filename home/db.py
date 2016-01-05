@@ -84,14 +84,21 @@ def connectTypeNodes(typeFrom, relName, typeTo):
     typeTo = getTypeNode(typeTo)
     relType = getRelationshipType(relName)
     if (typeFrom != None and typeTo != None and relType != None):
+        if connectionExistBetweenTypeNodes(typeFrom, relType, typeTo):
+            return "Connection exists"
         fromToRel = Relationship(typeFrom, "HAS_RELATIONSHIP", relType)
         fromToRel['nameOfRelated'] = typeTo['name']
         relToTo = Relationship(relType, "HAS_RELATIONSHIP", typeTo)
         g.create(relType, fromToRel, relToTo)
         return "Relationship created successfully!"
-
     else:
         return "Type or relationship not found: typeFrom - " + typeFrom + " typeTo - " + typeTo + " relType - " + relType
+
+def connectionExistBetweenTypeNodes(typeFrom, relType, typeTo):
+    for rel in typeFrom.match():
+        if (rel['nameOfRelated'] == typeTo['name']):
+            return True
+    return False
 	
 def getRelationshipNames():
     result = g.cypher.execute("MATCH (n:RelationshipType) RETURN n")
