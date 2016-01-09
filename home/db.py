@@ -76,7 +76,7 @@ def createRelationshipType(nodeFromName, relationshipName, nodeToName):
         fromToRel = Relationship(fromType, "HAS_RELATIONSHIP", relType)
         fromToRel['forwardRelated'] = toType['name']
         relToTo = Relationship(relType, "HAS_RELATIONSHIP", toType)
-        relToTo['backwardRelated'] = typeFrom['name']
+        relToTo['backwardRelated'] = fromType['name']
         g.create(relType, fromToRel, relToTo)
         return relType
     else:
