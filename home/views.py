@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import db
 
-#TODO Allow creation of typeTo, rel, typeFrom simulataniously also with arbitrary number of relationships
+#TODO Save name with input cases, then when trying to access a node, match to any node with with the same letters regardless of case
 #TODO Edit worldfromscratch
 
 def home(request):
