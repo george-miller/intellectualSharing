@@ -20,8 +20,8 @@ def findSingleNodeFromCypherResult(result):
     elif order == 1:
         return result[0][0]
     else:
-        print "Error multiple nodes found when searching typeName " + typeName
-        return "Error multiple nodes found when searching typeName " + typeName
+        print "Error multiple nodes found when single node expected in " + str(result)
+        return "Error multiple nodes found when single node expected in " + str(result)
 
 
 def createNode(typeName, name, description):
@@ -36,13 +36,8 @@ def createRelationship(nodeFrom, relationship, nodeTo):
 
 def getNode(nodeType, name):
     result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
-    order = result.to_subgraph().order
-    if order == 1:
-        return result[0][0]
-    elif order > 1:
-        print "Error multiple nodes found for nodeType " + nodeType + " and name " + name
-    return None
-    
+    return findSingleNodeFromCypherResult(result)
+   
 def getCentralRelationshipName(fromType, toType):
     for rel in fromType.match("HAS_RELATIONSHIP"):
         if rel['forwardRelated'] == toType['name']:
