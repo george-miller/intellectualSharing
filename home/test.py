@@ -20,12 +20,19 @@ TypeMovie = db.createTypeNode('movie')
 TypeGenre = db.createTypeNode('genre')
 TypeCharacter = db.createTypeNode('character')
 TypeAward = db.createTypeNode('award')
-RelHadRole = db.createRelationshipType('actor', 'HAD_ROLE', 'role')
-RelInProductionOf = db.createRelationshipType('role', 'IN_PRODUCTION_OF', 'movie')
-RelHasGenre = db.createRelationshipType('movie', 'HAS_GENRE', 'genre')
-RelPlayed = db.createRelationshipType('role', 'PLAYED', 'character')
-RelActorAwarded = db.createRelationshipType('actor', 'AWARDED', 'award')
-RelMovieAwarded = db.createRelationshipType('movie', 'AWARDED', 'award')
+
+RelHadRole = db.createRelationshipType('HAD_ROLE')
+RelInProductionOf = db.createRelationshipType('IN_PRODUCTION_OF')
+RelHasGenre = db.createRelationshipType('HAS_GENRE')
+RelPlayed = db.createRelationshipType('PLAYED')
+RelAwarded = db.createRelationshipType('AWARDED')
+
+db.connectTypeNodes(TypeActor, RelHadRole, TypeRole)
+db.connectTypeNodes(TypeRole, RelInProductionOf, TypeMovie)
+db.connectTypeNodes(TypeMovie, RelHasGenre, TypeGenre)
+db.connectTypeNodes(TypeRole, RelPlayed, TypeCharacter)
+db.connectTypeNodes(TypeActor, RelAwarded, TypeAward)
+db.connectTypeNodes(TypeMovie, RelAwarded, TypeAward)
 
 #CREATE instance of meta
 actor = db.createNode('actor', 'Daniel Craig', "He has blue eyes and blond hair")
@@ -50,12 +57,6 @@ class TestDbApi(unittest.TestCase):
 		self.assertEqual(db.getNode('role', 'Daniel Craig'), role)
 		self.assertEqual(db.getNode('character', 'James Bond'), character)
 		self.assertEqual(db.getNode('movie', 'Skyfall'), movie)
-
-	def testGetCentralRelationshipName(self):
-		self.assertEqual(db.getCentralRelationshipName(TypeActor, TypeRole), 'HAD_ROLE')
-	
-	def testIsRelationshipOnTypeNode(self):
-		self.assertEqual(db.isRelationshipOnTypeNode('HAD_ROLE', 'actor', 'role'), True)
 
 
 for rel in db.g.match():
