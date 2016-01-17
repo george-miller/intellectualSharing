@@ -82,9 +82,25 @@ def createRelationship(nodeFrom, relationship, nodeTo):
     return rel
 
 def getNode(nodeType, name):
-    print "MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n"
     result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
-    print result
     return findSingleNodeFromCypherResult(result)
 
-#TODO: routeForwardRels routeBackwardRels
+def getOutgoingRels(node):
+    if 'TypeNode' in node.labels:
+        print "This method does not work for TypeNodes"
+        return None
+    else:
+        rels = []
+        for i in node.match_outgoing():
+            rels.append((i.type, i.end_node.labels.pop(), i.end_node['name']))
+        return rels
+
+def getIncomingRels(node):
+    if 'TypeNode' in node.labels:
+        print "This method does not work for TypeNodes"
+        return None
+    else:
+        rels = []
+        for i in node.match_incoming():
+            rels.append((i.type, i.start_node.labels.pop(), i.start_node['name']))
+        return rels

@@ -10,8 +10,24 @@
 
 {% include 'header.html' %}
 
+{% load get_range get_len lookup %}
+
 <div class='row'>
-    {{node}}
+    Node: {{node}}
+
+    <h4>Outgoing Relationships</h4>
+    {% for i in outgoingRels|get_len|get_range %}
+    Relationship Name: {{outgoingRels|lookup:i|lookup:0}} 
+    Related to: <a href="/viewNode/{{outgoingRels|lookup:i|lookup:1}}/{{outgoingRels|lookup:i|lookup:2}}">Type: {{outgoingRels|lookup:i|lookup:1}} Name: {{outgoingRels|lookup:i|lookup:2}}</a>
+    <br/>
+    {% endfor %}
+
+    <h4>Incoming Relationships</h4>
+    {% for i in incomingRels|get_len|get_range %}
+    Relationship Name: {{incomingRels|lookup:i|lookup:0}} 
+    Related to: <a href="/viewNode/{{incomingRels|lookup:i|lookup:1}}/{{incomingRels|lookup:i|lookup:2}}">Type: {{incomingRels|lookup:i|lookup:1}} Name: {{incomingRels|lookup:i|lookup:2}}</a>
+    <br/>
+    {% endfor %}
 </div>
 
 {% endblock %}

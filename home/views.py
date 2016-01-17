@@ -60,6 +60,17 @@ def addRelationshipBetweenNodes(request):
     else:
         return HttpResponse("Nodes couldn't be found, their results were: " + str(nodeTo) + str(nodeFrom))
 
+def viewNode(request, typeName, name):
+    node = db.getNode(typeName, name)
+    if node != None:
+        return render(request, 'node.html', 
+            {"node": node, 
+            "outgoingRels": db.getOutgoingRels(node), 
+            "incomingRels": db.getIncomingRels(node)
+            })
+    else:
+        return HttpResponse('Node not found.')
+
 
 # ----- META API ------
 
@@ -110,13 +121,6 @@ def connectTypeNodes(request):
             db.connectTypeNodes(typeNode, relType, otherTypeNode)
     else:
         return HttpResponse("Only POST requests supported")
-
-def viewNode(request, typeName, name):
-    node = db.getNode(typeName, name)
-    if node != None:
-        return render(request, 'node.html', {"node": node})
-    else:
-        return HttpResponse('Node not found.')
 
 
 

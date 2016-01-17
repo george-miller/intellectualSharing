@@ -35,10 +35,10 @@ db.connectTypeNodes(TypeActor, RelAwarded, TypeAward)
 db.connectTypeNodes(TypeMovie, RelAwarded, TypeAward)
 
 #CREATE instance of meta
-actor = db.createNode('actor', 'Daniel Craig', "He has blue eyes and blond hair")
-role = db.createNode("role", "Daniel Craig", "Daniel Craig played a role")
-character = db.createNode("character", 'James Bond', "A british mi6 spy who fights evil across the world!  He also gets tons of ridiculously hot girls")
-movie = db.createNode("movie", "Skyfall", "This movie is about James Bond's return to his old home.")
+actor = db.createNode('actor', 'Daniel Craig')
+role = db.createNode("role", "Daniel Craig")
+character = db.createNode("character", 'James Bond')
+movie = db.createNode("movie", "Skyfall")
 
 actorHasRole = db.createRelationship(actor, "HAD_ROLE", role)
 rolePlayed = db.createRelationship(role, "PLAYED", character)
@@ -57,6 +57,15 @@ class TestDbApi(unittest.TestCase):
 		self.assertEqual(db.getNode('role', 'Daniel Craig'), role)
 		self.assertEqual(db.getNode('character', 'James Bond'), character)
 		self.assertEqual(db.getNode('movie', 'Skyfall'), movie)
+
+	def testGetOutgoingRels(self):
+		rels = db.getOutgoingRels(role)
+		self.assertIn((u'IN_PRODUCTION_OF', u'movie', u'Skyfall'), rels)
+		self.assertIn((u'PLAYED', u'character', u'James Bond'), rels)
+
+	def testGetIncomingRels(self):
+		self.assertIn((u'HAD_ROLE', u'actor', u'Daniel Craig'), db.getIncomingRels(role))
+
 
 
 for rel in db.g.match():
