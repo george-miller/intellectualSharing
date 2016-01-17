@@ -71,8 +71,8 @@ def connectTypeNodes(typeFrom, relType, typeTo):
 
 # ----- NON META METHODS ------ 
 
-def createNode(typeName, name, description):
-    node = Node(typeName, name=name, description=description)
+def createNode(typeName, name):
+    node = Node(typeName, name=name)
     g.create(node)
     return node
 

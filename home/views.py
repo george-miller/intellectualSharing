@@ -18,11 +18,10 @@ def addNode(request):
     typeNode = db.getTypeNode(typeName)
     if typeNode != None:
         name = request.POST.get('name')
-        description = request.POST.get('description')
-        if name == "" or description == "":
-            return HttpResponse("name and description must not be empty")
+        if name == "":
+            return HttpResponse("name must not be empty")
         else:
-            db.createNode(typeName, name, description)
+            db.createNode(typeName, name)
             return HttpResponse("Node created")
     else:
         return HttpResponse("Type node not found with typeName " + typeName + ".  The type must be in the meta before adding an instance of it")
