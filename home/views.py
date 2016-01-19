@@ -79,7 +79,7 @@ def createTypeNode(request):
     if request.method == 'POST':
         typeName = str(request.POST.get('typeName')).lower()
         typeNode = db.getTypeNode(typeName)
-        if typeNode == None:
+        if typeNode == None and typeName != "":
             db.createTypeNode(typeName)
             return HttpResponse("Type Node created")
         else:
@@ -94,7 +94,7 @@ def createRelationshipType(request):
     if request.method == 'POST':
         relName = str(request.POST.get('relName')).upper()
         relType = db.getRelationshipType(relName)
-        if relType == None:
+        if relType == None and relName != "":
             db.createRelationshipType(relName)
             return HttpResponse("Relationship Type created")
         else:
