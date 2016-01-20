@@ -12,7 +12,7 @@ def home(request):
 
 # POST data must contain 'typeName', 'name', and 'description'
 def addNode(request):
-    typeName = request.POST.get('typeName')
+    typeName = str(request.POST.get('typeName')).lower()
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call")
     typeNode = db.getTypeNode(typeName)
@@ -28,7 +28,7 @@ def addNode(request):
             
 # required POST data: 'type', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
-    node = db.getNode(request.POST.get('type'), request.POST.get('name'))
+    node = db.getNode(str(request.POST.get('type')).lower(), request.POST.get('name'))
     if node != None:
         node[request.POST.get('propName')] = request.POST.get('propValue')
         node.push()
@@ -39,17 +39,17 @@ def addPropertyToNode(request):
 
 # POST data must contain 'nodeToType', 'nodeToName', 'nodeFromType', 'nodeFromName', 'relationshipName'
 def addRelationshipBetweenNodes(request):
-    nodeTo = db.getNode(request.POST.get('nodeToType'), request.POST.get('nodeToName'))
-    nodeFrom = db.getNode(request.POST.get('nodeFromType'), request.POST.get('nodeFromName'))
+    nodeTo = db.getNode(str(request.POST.get('nodeToType')).lower(), request.POST.get('nodeToName'))
+    nodeFrom = db.getNode(str(request.POST.get('nodeFromType')).lower(), request.POST.get('nodeFromName'))
     if nodeTo != None and nodeFrom != None:
-        relationshipName = request.POST.get('relationshipName')
+        relationshipName = str(request.POST.get('relationshipName')).upper()
         if relationshipName == "":
             return HttpResponse("relationshipName must not be empty")
         else:
             # Is a realtionship with this name in the meta?
             if db.getRelationshipTypeNameBetweenTypeNodes(
-                db.getTypeNode(request.POST.get('nodeToType')),
-                db.getTypeNode(request.POST.get('nodeFromType'))
+                db.getTypeNode(str(request.POST.get('nodeToType')).lower()),
+                db.getTypeNode(str(request.POST.get('nodeFromType')).lower())
                 ):
                 db.createRelationship(nodeFrom, relationshipName, nodeTo)
                 return HttpResponse("Relationship created successfully")
@@ -77,7 +77,7 @@ def viewNode(request, typeName, name):
 # Required POST data: 'typeName'
 def createTypeNode(request):
     if request.method == 'POST':
-        typeName = request.POST.get('typeName')
+        typeName = str(request.POST.get('typeName')).lower()
         typeNode = db.getTypeNode(typeName)
         if typeNode == None and typeName != "":
             db.createTypeNode(typeName)
@@ -92,7 +92,7 @@ def createTypeNode(request):
 # Required POST data: 'relName'
 def createRelationshipType(request):
     if request.method == 'POST':
-        relName = request.POST.get('relName')
+        relName = str(request.POST.get('relName')).upper()
         relType = db.getRelationshipType(relName)
         if relType == None and relName != "":
             db.createRelationshipType(relName)
@@ -105,9 +105,9 @@ def createRelationshipType(request):
 # Required POST data: 'typeFromName', 'relName', 'typeToName'
 def connectTypeNodes(request):
     if request.method == 'POST':
-        typeFromName =  request.POST.get('typeFromName')
-        relName = request.POST.get('relName')
-        typeToName = request.POST.get('typeToName')
+        typeFromName = str(request.POST.get('typeFromName')).lower()
+        relName = str(request.POST.get('relName')).upper()
+        typeToName = str(request.POST.get('typeToName')).lower()
         typeFrom = db.getTypeNode(typeFromName)
         typeTo = db.getTypeNode(typeToName)
         relType = db.getRelationshipType(relName)
