@@ -61,7 +61,7 @@ def addRelationshipBetweenNodes(request):
         return HttpResponse("Nodes couldn't be found, their results were: " + str(nodeTo) + str(nodeFrom))
 
 def viewNode(request, typeName, name):
-    node = db.getNode(typeName.title(), name.title())
+    node = db.getNode(typeName, name)
     if node != None:
         return render(request, 'node.html', 
             {"node": node, 
