@@ -42,6 +42,9 @@
 
 {% block script %}
 <script>
+var path = window.location.pathname;
+path = path.substring(0, path.length-14);
+
 var appendRelHtml = function(){
     var appended = getAddRelationshipHtml()
     $("#relBlock").append(appended);
@@ -111,13 +114,13 @@ var submit = function(){
             }
         };
         $.each(typeNames, function(i, typeName){
-            $.post('/createTypeNode', {'typeName': typeName}, function(data){
+            $.post(path +'createTypeNode', {'typeName': typeName}, function(data){
                 handleResponse(data);
                 finishedRequest();
             });
         }); 
         $.each(relNames, function(i, relName){
-            $.post('/createRelationshipType', {'relName': relName}, function(data){
+            $.post(path +'createRelationshipType', {'relName': relName}, function(data){
                 handleResponse(data);
                 finishedRequest();
             });
@@ -131,7 +134,7 @@ var submit = function(){
             var typeFrom = $(rel).children('input[name="typeFrom"]').val();
             var typeTo = $(rel).children('input[name="typeTo"]').val();
             var relName = $(rel).children('input[name="relName"]').val();
-            $.post('/connectTypeNodes', 
+            $.post(path +'connectTypeNodes', 
                 {'typeFrom': typeFrom, 'relName': relName, 'typeTo': typeTo}, 
                 handleResponse);
         });
