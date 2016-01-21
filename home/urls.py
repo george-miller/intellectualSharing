@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^viewNode/(?P<typeName>[\w| ]+)/(?P<name>[\w| ]+)/', views.viewNode, name='viewNode'),
 
     # META API
+    url(r'^typeNodeEditor', views.typeNodeEditor, name='typeNodeEditor'),
     url(r'^createTypeNode', views.createTypeNode, name='createTypeNode'),
     url(r'^createRelationshipType', views.createRelationshipType, name='createRelationshipType'),
     url(r'^connectTypeNodes', views.connectTypeNodes, name='connectTypeNodes'),

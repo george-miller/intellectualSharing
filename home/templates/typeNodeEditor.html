@@ -1,0 +1,158 @@
+{% extends "skeleton.html" %}
+
+{% block style %}
+<style type="text/css" media="screen">
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'header.html' %}
+
+
+{% load get_range %}
+<h3>Type Node Editor</h3>
+<p>Through this page, you can add TypeNodes into the meta.  With a TypeNode in the meta, you can create instances of that TypeNode to represent things in the world! <b>Notice: Directionality matters.</b> If a relationship reads Person Had_Role Role, you will not be able to add Had_Role relationships to Role instances, you would instead add Had_Role relationships to Person instances.  To help make sure you add relationships in the correct direction, read the relationship from left to right and ask yourself if it makes sense.  If it should be reversed, just click the checkbox!</p>
+
+<div id="responses"></div>
+
+<datalist id='relList'>
+    {% for rel in rels %}
+    <option value="{{rel}}">{{rel}}</option>
+    {% endfor %}
+</datalist>
+
+<datalist id='typeList'>
+    {% for type in types %}
+    <option value="{{type}}">{{type}}</option>
+    {% endfor %}
+</datalist>
+
+<br/>
+<input type="text" id="typeName" placeholder="New Type Name" list='typeList'>
+<br/><br/>
+<div id='relBlock'></div>
+<a id="relAdder">Add a relationship to this TypeNode</a>
+<br/>
+<input id="submit" type="submit">
+<br/><br/>
+
+{% endblock %}
+
+{% block script %}
+<script>
+var appendRelHtml = function(){
+    var appended = getAddRelationshipHtml()
+    $("#relBlock").append(appended);
+}
+var getAddRelationshipHtml = function(){
+    return $("<div name='relationship'>" + 
+    "<input name='typeFrom' value='" + $("#typeName").val() + "' disabled list='typeList'>" +
+    " -> <input type='text' name='relName' list='relList'>" + 
+    " -> <input type='text' name='typeTo' list='typeList'><br/>" +
+    "<button type='button' onclick='reverseRelationship(this)'> Reverse this relationship</button><br/><br/></div>");
+}
+var reverseRelationship = function(button){
+    var typeTo = $(button).siblings('input[name="typeTo"]');
+    var typeFrom = $(button).siblings('input[name="typeFrom"]');
+    var typeToVal = typeTo.val();
+    typeTo.val(typeFrom.val());
+    typeFrom.val(typeToVal);
+    typeTo.prop('disabled', !typeTo.prop('disabled'));
+    typeFrom.prop('disabled', !typeFrom.prop('disabled'));
+}
+var onTypeNameChange = function(){
+    var newTypeName = $("#typeName").val();
+    var typeNames = document.getElementsByName('typeFrom');
+    $.each(typeNames, function(i, val){
+        $(val).val(newTypeName);
+    });
+}
+var submit = function(){
+    // We need to collect all of the information, remove redundencies, then make requests
+    var responses = $("#responses");
+    responses.empty();
+    responses.append("Responses:<br/>");
+    var handleResponse = function(data){
+        responses.append(data + '<br/>');
+    };
+    var getStringArrayOfValsOfInputsWithNames = function(names){
+        var values = [];
+        for (var i = 0; i < names.length; i++){
+            var elements = document.getElementsByName(names[i]);
+            for (var j = 0; j < elements.length; j++){
+                if (!$(elements[j]).prop('disabled')){
+                    values.push($(elements[j]).val());
+                }
+            }
+        }
+        return values;
+    };
+    var removeRedundant = function(array){
+        var nonredundantTypes = [];
+        for (var i = 0; i < array.length; i++){
+            if ($.inArray(array[i], nonredundantTypes) == -1){
+                nonredundantTypes.push(array[i]);
+            }
+        }
+        return nonredundantTypes;
+    };
+    
+    var createTypesAndRelationships = function(callback){
+        typeNames = removeRedundant(getStringArrayOfValsOfInputsWithNames(['typeTo','typeFrom']));
+        typeNames.push($("#typeName").val());
+        relNames = removeRedundant(getStringArrayOfValsOfInputsWithNames(['relName']));
+        var totalResponses = typeNames.length + relNames.length;
+        var finishedRequest = function(){
+            totalResponses--;
+            if (totalResponses == 0){
+                callback();
+            }
+        };
+        $.each(typeNames, function(i, typeName){
+            $.post('/createTypeNode', {'typeName': typeName}, function(data){
+                handleResponse(data);
+                finishedRequest();
+            });
+        }); 
+        $.each(relNames, function(i, relName){
+            $.post('/createRelationshipType', {'relName': relName}, function(data){
+                handleResponse(data);
+                finishedRequest();
+            });
+        }); 
+    };
+
+    createTypesAndRelationships(function(){
+        // All nodes are guarenteed to have been created at this point, it is safe to connect them
+        var relationships = document.getElementsByName('relationship');
+        $.each(relationships, function(i,rel){
+            var typeFrom = $(rel).children('input[name="typeFrom"]').val();
+            var typeTo = $(rel).children('input[name="typeTo"]').val();
+            var relName = $(rel).children('input[name="relName"]').val();
+            $.post('/connectTypeNodes', 
+                {'typeFrom': typeFrom, 'relName': relName, 'typeTo': typeTo}, 
+                handleResponse);
+        });
+    });
+}
+
+$(document).ready(function(){
+    numRels = $("#numRels");
+    relBlock = $("#relBlock");
+    numRels.change(function(){
+        relBlock.empty();
+        for (i = 0; i < numRels.val(); i++){
+            relBlock.append(getHtmlInputs(i));
+        }
+    });
+
+    $("#relAdder").click(appendRelHtml);
+    $("#typeName").on('input propertychange paste', onTypeNameChange);
+    $("#submit").click(submit);
+
+});
+
+</script>
+{% endblock %}
