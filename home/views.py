@@ -48,8 +48,8 @@ def addRelationshipBetweenNodes(request):
         else:
             # Is a realtionship with this name in the meta?
             if db.getRelationshipTypeNameBetweenTypeNodes(
-                db.getTypeNode(str(request.POST.get('nodeToType')).title()),
-                db.getTypeNode(str(request.POST.get('nodeFromType')).title())
+                db.getTypeNode(str(request.POST.get('nodeFromType')).title()),
+                db.getTypeNode(str(request.POST.get('nodeToType')).title())
                 ) == relationshipName:
                 db.createRelationship(nodeFrom, relationshipName, nodeTo)
                 return HttpResponse("Relationship created successfully")
