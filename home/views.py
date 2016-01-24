@@ -50,7 +50,7 @@ def addRelationshipBetweenNodes(request):
             if db.getRelationshipTypeNameBetweenTypeNodes(
                 db.getTypeNode(str(request.POST.get('nodeToType')).title()),
                 db.getTypeNode(str(request.POST.get('nodeFromType')).title())
-                ):
+                ) == relationshipName:
                 db.createRelationship(nodeFrom, relationshipName, nodeTo)
                 return HttpResponse("Relationship created successfully")
             else:
