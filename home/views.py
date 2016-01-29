@@ -2,6 +2,10 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import db
 
+#TODO check if node/relationship is in DB before adding it.
+#TODO TESTS
+#TODO Strict input checking
+
 #TODO Save name with input cases, then when trying to access a node, match to any node with with the same letters regardless of case
 #TODO Edit worldfromscratch
 
