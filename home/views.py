@@ -15,7 +15,7 @@ def home(request):
 
 # ------ NON-META API ------
 
-# POST data must contain 'typeName', 'name', and 'description'
+# POST data must contain 'typeName' and 'name'
 def addNode(request):
     typeName = str(request.POST.get('typeName')).title()
     if typeName == 'TypeNode':
@@ -30,7 +30,7 @@ def addNode(request):
             return HttpResponse("Node created")
     else:
         return HttpResponse("Type node not found with typeName " + typeName + ".  The type must be in the meta before adding an instance of it")
-            
+
 # required POST data: 'type', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
     node = db.getNode(str(request.POST.get('type')).title(), request.POST.get('name'))
@@ -86,14 +86,14 @@ def createTypeNode(request):
         typeName = str(request.POST.get('typeName')).title()
         typeNode = db.getTypeNode(typeName)
         if typeName == "":
-            return HttpResponse("You must specify a name for your Type Node")
+            return HttpResponse("You must specify a name for your Type Node", status=400)
         elif typeNode == None:
             db.createTypeNode(typeName)
-            return HttpResponse("Type Node "+typeName+" created")
+            return HttpResponse("Type Node "+typeName+" created", status=201)
         else:
-            return HttpResponse("Type Node "+typeName+" exists")
+            return HttpResponse("Type Node "+typeName+" exists", status=200)
     else:
-        return HttpResponse("Only POST requests supported")
+        return HttpResponse("Only POST requests supported", status=400)
 
 # Required POST data: 'relName'
 def createRelationshipType(request):
@@ -101,14 +101,14 @@ def createRelationshipType(request):
         relName = str(request.POST.get('relName')).title()
         relType = db.getRelationshipType(relName)
         if relName == "":
-            return HttpResponse("You must specify a name for your Relationship Type")
+            return HttpResponse("You must specify a name for your Relationship Type", status=400)
         elif relType == None:
             db.createRelationshipType(relName)
-            return HttpResponse("Relationship Type "+relName+" created")
+            return HttpResponse("Relationship Type "+relName+" created", status=201)
         else:
-            return HttpResponse("Relationship Type "+relName+" exists")
+            return HttpResponse("Relationship Type "+relName+" exists", status=200)
     else:
-        return HttpResponse("Only POST requests supported")
+        return HttpResponse("Only POST requests supported", status=400)
 
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
 def connectTypeNodes(request):
@@ -120,16 +120,16 @@ def connectTypeNodes(request):
         typeToNode = db.getTypeNode(typeTo)
         relType = db.getRelationshipType(relName)
         if typeFrom == None:
-            return HttpResponse("Couldn't find typeFrom " + typeFrom)
+            return HttpResponse("Couldn't find typeFrom " + typeFrom, status=400)
         elif typeTo == None:
-            return HttpResponse("Couldn't find typeTo " + typeTo)
+            return HttpResponse("Couldn't find typeTo " + typeTo, status=400)
         elif relType == None:
-            return HttpResponse("Couldn't find relType from name " + relName)
+            return HttpResponse("Couldn't find relType from name " + relName, status=400)
         else:
             response = db.connectTypeNodes(typeFromNode, relType, typeToNode)
-            return HttpResponse(response + " " + typeFrom + " -> " + relName + " -> " + typeTo)
+            return HttpResponse(response + " " + typeFrom + " -> " + relName + " -> " + typeTo, status=201)
     else:
-        return HttpResponse("Only POST requests supported")
+        return HttpResponse("Only POST requests supported", status=400)
 
 def typeNodeEditor(request):
     rels = db.getRelationshipTypeNames()

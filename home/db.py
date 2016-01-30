@@ -16,7 +16,7 @@ def findSingleNodeFromCypherResult(result):
         return result[0][0]
     else:
         print "Error multiple nodes found when single node expected in " + str(result)
-        return "Error multiple nodes found when single node expected in " + str(result)
+        return None
 
 # --- META METHODS ---
 
