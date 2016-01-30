@@ -21,10 +21,12 @@ def findSingleNodeFromCypherResult(result):
 # --- META METHODS ---
 
 def getTypeNode(typeName):
+    typeName = typeName.title()
     result = g.cypher.execute("MATCH (n:TypeNode {name:'" + typeName + "'}) RETURN n")
     return findSingleNodeFromCypherResult(result)
 
 def getRelationshipType(relName):
+    relName = relName.title()
     result = g.cypher.execute("MATCH (n:RelationshipType {name: '" + relName + "'}) RETURN n")
     return findSingleNodeFromCypherResult(result)
    
@@ -49,11 +51,13 @@ def getTypeNames():
     return typeNames
 
 def createTypeNode(name):
+    name = name.title()
     n = Node("TypeNode", name=name)
     g.create(n)
     return n
 
 def createRelationshipType(relationshipName):
+    relationshipName = relationshipName.title()
     relType = Node("RelationshipType", name=relationshipName)
     g.create(relType)
     return relType
@@ -72,6 +76,7 @@ def connectTypeNodes(typeFrom, relType, typeTo):
 # ----- NON META METHODS ------ 
 
 def createNode(typeName, name):
+    typeName = typeName.title()
     node = Node(typeName, name=name)
     g.create(node)
     return node
@@ -81,8 +86,9 @@ def createRelationship(nodeFrom, relationship, nodeTo):
     g.create(rel)
     return rel
 
-def getNode(nodeType, name):
-    result = g.cypher.execute("MATCH (n:" + nodeType + " {name:'" + name + "'}) RETURN n")
+def getNode(typeName, name):
+    typeName = typeName.title()
+    result = g.cypher.execute("MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n")
     return findSingleNodeFromCypherResult(result)
 
 def getOutgoingRels(node):

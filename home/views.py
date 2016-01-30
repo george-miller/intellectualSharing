@@ -17,13 +17,13 @@ def home(request):
 
 # POST data must contain 'typeName' and 'name'
 def addNode(request):
-    typeName = str(request.POST.get('typeName')).title()
+    typeName = request.POST.get('typeName')
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call")
     typeNode = db.getTypeNode(typeName)
     if typeNode != None:
         name = request.POST.get('name')
-        if name == "":
+        if name == "" or name == None:
             return HttpResponse("name must not be empty")
         else:
             db.createNode(typeName, name)
@@ -33,7 +33,7 @@ def addNode(request):
 
 # required POST data: 'type', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
-    node = db.getNode(str(request.POST.get('type')).title(), request.POST.get('name'))
+    node = db.getNode(request.POST.get('type'), request.POST.get('name'))
     if node != None:
         node[request.POST.get('propName')] = request.POST.get('propValue')
         node.push()
@@ -44,17 +44,17 @@ def addPropertyToNode(request):
 
 # POST data must contain 'nodeToType', 'nodeToName', 'nodeFromType', 'nodeFromName', 'relationshipName'
 def addRelationshipBetweenNodes(request):
-    nodeTo = db.getNode(str(request.POST.get('nodeToType')).title(), request.POST.get('nodeToName'))
-    nodeFrom = db.getNode(str(request.POST.get('nodeFromType')).title(), request.POST.get('nodeFromName'))
+    nodeTo = db.getNode(request.POST.get('nodeToType'), request.POST.get('nodeToName'))
+    nodeFrom = db.getNode(request.POST.get('nodeFromType'), request.POST.get('nodeFromName'))
     if nodeTo != None and nodeFrom != None:
-        relationshipName = str(request.POST.get('relationshipName')).title()
-        if relationshipName == "":
+        relationshipName = request.POST.get('relationshipName')
+        if relationshipName == "" or relationshipName == "None":
             return HttpResponse("relationshipName must not be empty")
         else:
             # Is a realtionship with this name in the meta?
             if db.getRelationshipTypeNameBetweenTypeNodes(
-                db.getTypeNode(str(request.POST.get('nodeFromType')).title()),
-                db.getTypeNode(str(request.POST.get('nodeToType')).title())
+                db.getTypeNode(request.POST.get('nodeFromType')),
+                db.getTypeNode(request.POST.get('nodeToType'))
                 ) == relationshipName:
                 db.createRelationship(nodeFrom, relationshipName, nodeTo)
                 return HttpResponse("Relationship created successfully")
@@ -83,9 +83,9 @@ def viewNode(request, typeName, name):
 # Required POST data: 'typeName'
 def createTypeNode(request):
     if request.method == 'POST':
-        typeName = str(request.POST.get('typeName')).title()
+        typeName = request.POST.get('typeName')
         typeNode = db.getTypeNode(typeName)
-        if typeName == "":
+        if typeName == "" or typeName == "None":
             return HttpResponse("You must specify a name for your Type Node", status=400)
         elif typeNode == None:
             db.createTypeNode(typeName)
@@ -98,9 +98,9 @@ def createTypeNode(request):
 # Required POST data: 'relName'
 def createRelationshipType(request):
     if request.method == 'POST':
-        relName = str(request.POST.get('relName')).title()
+        relName = request.POST.get('relName')
         relType = db.getRelationshipType(relName)
-        if relName == "":
+        if relName == "" or relName == "None":
             return HttpResponse("You must specify a name for your Relationship Type", status=400)
         elif relType == None:
             db.createRelationshipType(relName)
@@ -113,9 +113,9 @@ def createRelationshipType(request):
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
 def connectTypeNodes(request):
     if request.method == 'POST':
-        typeFrom = str(request.POST.get('typeFrom')).title()
-        relName = str(request.POST.get('relName')).title()
-        typeTo = str(request.POST.get('typeTo')).title()
+        typeFrom = request.POST.get('typeFrom')
+        relName = request.POST.get('relName')
+        typeTo = request.POST.get('typeTo')
         typeFromNode = db.getTypeNode(typeFrom)
         typeToNode = db.getTypeNode(typeTo)
         relType = db.getRelationshipType(relName)

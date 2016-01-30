@@ -30,18 +30,18 @@ except:
 	exit()
 
 
-class TestMetaCreation(unittest.TestCase):
-	types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
-	relTypes = ['had_role', 'in_production_of', 'has_genre', 'played', 'awarded']
-	connections = [
-		('actor', 'had_role', 'role'), 
-		('role', 'in_production_of', 'movie'),
-		('movie', 'has_genre', 'genre'),
-		('role', 'played', 'character'),
-		('actor', 'awarded', 'award'),
-		('movie', 'awarded', 'award')
-	]
+types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
+relTypes = ['had_role', 'in_production_of', 'has_genre', 'played', 'awarded']
+connections = [
+	('actor', 'had_role', 'role'), 
+	('role', 'in_production_of', 'movie'),
+	('movie', 'has_genre', 'genre'),
+	('role', 'played', 'character'),
+	('actor', 'awarded', 'award'),
+	('movie', 'awarded', 'award')
+]
 
+class TestMetaCreate(unittest.TestCase):
 	def testAllWithOrder(self):
 		self.TestCreateTypeNodes()
 		self.TestCreateRelationshipTypes()
@@ -49,21 +49,29 @@ class TestMetaCreation(unittest.TestCase):
 
 	def TestCreateTypeNodes(self):
 		url = baseurl + 'createTypeNode'
-		for t in self.types:
+		for t in types:
 			data = {'typeName' : t}
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
+		for t in types:
+			data = {'typeName' : t}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 200)
 
 	def TestCreateRelationshipTypes(self):
 		url = baseurl + 'createRelationshipType'
-		for r in self.relTypes:
+		for r in relTypes:
 			data = {'relName' : r}
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
+		for r in relTypes:
+			data = {'relName' : r}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 200)
 
 	def TestConnectTypeNodes(self):
 		url = baseurl + 'connectTypeNodes'
-		for connection in self.connections:
+		for connection in connections:
 			data = {
 				'typeFrom' : connection[0],
 				'relName' : connection[1],
@@ -71,6 +79,29 @@ class TestMetaCreation(unittest.TestCase):
 			}
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
+
+class TestMetaGet(unittest.TestCase):
+	def testTypeNodes(self):
+		for t in types:
+			t = t.title()
+			self.assertEqual(db.getTypeNode(t)['name'], t)
+
+	def testGetRelTypes(self):
+		for r in relTypes:
+			r = r.title()
+			self.assertEqual(db.getRelationshipType(r)['name'], r)
+
+	def testGetRelBetweenTypes(self):
+		for c in connections:
+			typeFrom = db.getTypeNode(c[0].title())
+			typeTo = db.getTypeNode(c[2].title())
+			self.assertEqual(
+				db.getRelationshipTypeNameBetweenTypeNodes(typeFrom, typeTo),
+				c[1].title()
+			)
+
+# class testNodeCreate(unittest.TestCase)
+
 
 
 
