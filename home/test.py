@@ -31,6 +31,7 @@ except:
 
 
 types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
+badTypes = ['A C T', 'GG****', '[]', '|\|', ',..,']
 relTypes = ['had_role', 'in_production_of', 'has_genre', 'played', 'awarded']
 connections = [
 	('actor', 'had_role', 'role'), 
@@ -41,7 +42,7 @@ connections = [
 	('movie', 'awarded', 'award')
 ]
 
-class TestMetaCreate(unittest.TestCase):
+class MetaCreate(unittest.TestCase):
 	def testAllWithOrder(self):
 		self.TestCreateTypeNodes()
 		self.TestCreateRelationshipTypes()
@@ -49,6 +50,7 @@ class TestMetaCreate(unittest.TestCase):
 
 	def TestCreateTypeNodes(self):
 		url = baseurl + 'createTypeNode'
+		self.assertEqual(requests.get(url).status_code, 400)
 		for t in types:
 			data = {'typeName' : t}
 			response = requests.post(url, data)
@@ -57,9 +59,14 @@ class TestMetaCreate(unittest.TestCase):
 			data = {'typeName' : t}
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 200)
+		for t in badTypes:
+			data = {'typeName' : t}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 400)
 
 	def TestCreateRelationshipTypes(self):
 		url = baseurl + 'createRelationshipType'
+		self.assertEqual(requests.get(url).status_code, 400)
 		for r in relTypes:
 			data = {'relName' : r}
 			response = requests.post(url, data)
@@ -71,6 +78,7 @@ class TestMetaCreate(unittest.TestCase):
 
 	def TestConnectTypeNodes(self):
 		url = baseurl + 'connectTypeNodes'
+		self.assertEqual(requests.get(url).status_code, 400)
 		for connection in connections:
 			data = {
 				'typeFrom' : connection[0],
@@ -79,8 +87,16 @@ class TestMetaCreate(unittest.TestCase):
 			}
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
+		for connection in connections:
+			data = {
+				'typeFrom' : connection[0],
+				'relName' : connection[1],
+				'typeTo' : connection[2]
+			}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 200)
 
-class TestMetaGet(unittest.TestCase):
+class MetaGet(unittest.TestCase):
 	def testTypeNodes(self):
 		for t in types:
 			t = t.title()
@@ -100,32 +116,66 @@ class TestMetaGet(unittest.TestCase):
 				c[1].title()
 			)
 
-# class testNodeCreate(unittest.TestCase)
+
+nodes = [
+	('actor', 'Daniel Craig'),
+	('role', 'Daniel Craig In Skyfall'),
+	('character', 'James Bond'),
+	('movie', 'SkyFall'),
+	('genre', 'action')
+]
+badRequestNodes = [
+	('actor', '*)*#'),
+	('$$', 'Moneyyy'),
+	('TypeNode', 'Actor'),
+	('acto r', '____')
+]
+notFoundNodes = [
+	('poop', 'poop'),
+	('actorr', 'Baddie')
+]
+
+rels = [
+	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall'),
+	('role', 'Daniel Craig In Skyfall', 'played', 'character', 'James Bond'),
+]
+class NodeCreate(unittest.TestCase):
+	def testAddNode(self):
+		url = baseurl + 'addNode'
+		self.assertEqual(requests.get(url).status_code, 400)
+		for n in nodes:
+			data = {'typeName': n[0], 'name': n[1]}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 201)
+		for n in nodes:
+			data = {'typeName': n[0], 'name': n[1]}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 200)
+		for n in badRequestNodes:
+			data = {'typeName': n[0], 'name': n[1]}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 400)
+		for n in notFoundNodes:
+			data = {'typeName': n[0], 'name': n[1]}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 404)
+	def testAddRelationshipBetweenNodes(self):
+		url = baseurl + 'addRelationshipBetweenNodes'
+		self.assertEqual(requests.get(url).status_code, 400)
+		for r in rels:
+			data = {
+				'fromType': r[0],
+				'fromName' : r[1],
+				'relName' : r[2],
+				'toType' : r[3],
+				'toName' : r[4]
+			}
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 201)
+			response = requests.post(url, data)
+			self.assertEqual(response.status_code, 200)
 
 
-
-
-#CREATE META
-
-# TypeActor = db.createTypeNode('actor')
-# TypeRole = db.createTypeNode('role')
-# TypeMovie = db.createTypeNode('movie')
-# TypeGenre = db.createTypeNode('genre')
-# TypeCharacter = db.createTypeNode('character')
-# TypeAward = db.createTypeNode('award')
-
-# RelHadRole = db.createRelationshipType('HAD_ROLE')
-# RelInProductionOf = db.createRelationshipType('IN_PRODUCTION_OF')
-# RelHasGenre = db.createRelationshipType('HAS_GENRE')
-# RelPlayed = db.createRelationshipType('PLAYED')
-# RelAwarded = db.createRelationshipType('AWARDED')
-
-# db.connectTypeNodes(TypeActor, RelHadRole, TypeRole)
-# db.connectTypeNodes(TypeRole, RelInProductionOf, TypeMovie)
-# db.connectTypeNodes(TypeMovie, RelHasGenre, TypeGenre)
-# db.connectTypeNodes(TypeRole, RelPlayed, TypeCharacter)
-# db.connectTypeNodes(TypeActor, RelAwarded, TypeAward)
-# db.connectTypeNodes(TypeMovie, RelAwarded, TypeAward)
 
 # #CREATE instance of meta
 # actor = db.createNode('actor', 'Daniel Craig')
@@ -158,13 +208,6 @@ class TestMetaGet(unittest.TestCase):
 
 # 	def testGetIncomingRels(self):
 # 		self.assertIn((u'HAD_ROLE', u'actor', u'Daniel Craig'), db.getIncomingRels(role))
-
-
-
-# for rel in db.g.match():
-# 	print rel
-
-# print db.g.cypher.execute("MATCH (n) RETURN n")
 
 if __name__ == '__main__':
 	unittest.main()

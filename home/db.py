@@ -63,14 +63,11 @@ def createRelationshipType(relationshipName):
     return relType
 
 def connectTypeNodes(typeFrom, relType, typeTo):
-    if relType['name'] == getRelationshipTypeNameBetweenTypeNodes(typeFrom, typeTo):
-        return "Connection exists"
     fromToRel = Relationship(typeFrom, "HAS_RELATIONSHIP", relType)
     fromToRel['forwardRelated'] = typeTo['name']
     relToTo = Relationship(relType, "HAS_RELATIONSHIP", typeTo)
     relToTo['backwardRelated'] = typeFrom['name']
     g.create(fromToRel, relToTo)
-    return "Type Nodes connected!"
 
 
 # ----- NON META METHODS ------ 
@@ -81,10 +78,18 @@ def createNode(typeName, name):
     g.create(node)
     return node
 
-def createRelationship(nodeFrom, relationship, nodeTo):
-    rel = Relationship(nodeFrom, relationship, nodeTo)
+def createRelationship(nodeFrom, relName, nodeTo):
+    relName = relName.title()
+    rel = Relationship(nodeFrom, relName, nodeTo)
     g.create(rel)
     return rel
+
+def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
+    relName = relName.title()
+    for rel in nodeFrom.match(relName):
+        if rel.end_node == nodeTo:
+            return True
+    return False
 
 def getNode(typeName, name):
     typeName = typeName.title()
