@@ -18,13 +18,13 @@
     <h4>Outgoing Relationships</h4>
     {% for i in outgoingRels|get_len|get_range %}
     {{nodeType}} : {{nodeName}} -&gt; {{outgoingRels|lookup:i|lookup:0}} 
-    -&gt; <a href="/viewNode/{{outgoingRels|lookup:i|lookup:1}}/{{outgoingRels|lookup:i|lookup:2}}"> {{outgoingRels|lookup:i|lookup:1}} : {{outgoingRels|lookup:i|lookup:2}}</a>
+    -&gt; <a href="../../{{outgoingRels|lookup:i|lookup:1}}/{{outgoingRels|lookup:i|lookup:2}}"> {{outgoingRels|lookup:i|lookup:1}} : {{outgoingRels|lookup:i|lookup:2}}</a>
     <br/>
     {% endfor %}
 
     <h4>Incoming Relationships</h4>
     {% for i in incomingRels|get_len|get_range %}
-    <a href="/viewNode/{{incomingRels|lookup:i|lookup:1}}/{{incomingRels|lookup:i|lookup:2}}"> {{incomingRels|lookup:i|lookup:1}} : {{incomingRels|lookup:i|lookup:2}}</a>
+    <a href="../../{{incomingRels|lookup:i|lookup:1}}/{{incomingRels|lookup:i|lookup:2}}"> {{incomingRels|lookup:i|lookup:1}} : {{incomingRels|lookup:i|lookup:2}}</a>
     -&gt; {{incomingRels|lookup:i|lookup:0}} 
     -&gt; {{nodeType}} : {{nodeName}} 
     <br/>

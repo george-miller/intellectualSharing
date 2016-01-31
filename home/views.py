@@ -138,7 +138,7 @@ def viewNode(request, typeName, name):
             "incomingRels": db.getIncomingRels(node)
             })
     else:
-        return HttpResponse(nodeString(typeName, name)+' not found.')
+        return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
 
 
 # ----- META API ------
