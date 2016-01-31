@@ -6,6 +6,7 @@ from py2neo import *
 import unittest
 import requests
 import db
+import random
 
 # Setup, making sure everything responds correctly
 if (raw_input("This will DELETE your WHOLE database.  Continue? (y/n): ") != 'y'):
@@ -28,6 +29,10 @@ try:
 except:
 	print "Neo4j server isn't running, please start it on port 7474"
 	exit()
+
+words = requests.get("http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").content.splitlines()
+def getRandomWord():
+	return words[random.randint(0, len(words))]
 
 
 types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
@@ -121,8 +126,9 @@ nodes = [
 	('actor', 'Daniel Craig'),
 	('role', 'Daniel Craig In Skyfall'),
 	('character', 'James Bond'),
-	('movie', 'SkyFall'),
-	('genre', 'action')
+	('movie', 'Skyfall'),
+	('genre', 'action'),
+	('award', 'Tony')
 ]
 badRequestNodes = [
 	('actor', '*)*#'),
@@ -135,79 +141,76 @@ notFoundNodes = [
 	('actorr', 'Baddie')
 ]
 
+badAddNodePostData = [
+	[
+		('typeName', getRandomWord()),
+		(getRandomWord(), getRandomWord())
+	],
+	[
+		(getRandomWord(), getRandomWord()),
+		('name', getRandomWord())
+	],
+	[
+		(getRandomWord(), getRandomWord()),
+		(getRandomWord(), getRandomWord())
+	]
+]
+
 rels = [
 	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall'),
 	('role', 'Daniel Craig In Skyfall', 'played', 'character', 'James Bond'),
+	('role', 'Daniel Craig In Skyfall', 'in_production_of', 'movie', 'Skyfall'),
+	('movie', 'Skyfall', 'has_genre', 'genre', 'action'),
+	('movie', 'Skyfall', 'awarded', 'award', 'Tony')
 ]
 class NodeCreate(unittest.TestCase):
-	def testAddNode(self):
+	def testAddNodesandRels(self):
+		self.TestAddNode()
+		self.TestAddRelationshipBetweenNodes()
+
+	def sendAddNodeRequest(self, url, n, expected_code):
+		data = {'typeName': n[0], 'name': n[1]}
+		response = requests.post(url, data)
+		self.assertEqual(response.status_code, expected_code)
+
+	def TestBadPostData(self, url, data):
+		postData = {}
+		for d in data:
+			postData[d[0]] = d[1]
+		response = requests.post(url, postData)
+		self.assertEqual(response.status_code, 400)
+
+	def TestAddNode(self):
 		url = baseurl + 'addNode'
 		self.assertEqual(requests.get(url).status_code, 400)
 		for n in nodes:
-			data = {'typeName': n[0], 'name': n[1]}
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 201)
-		for n in nodes:
-			data = {'typeName': n[0], 'name': n[1]}
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 200)
+			self.sendAddNodeRequest(url, n, 201)
+			self.sendAddNodeRequest(url, n, 200)
 		for n in badRequestNodes:
-			data = {'typeName': n[0], 'name': n[1]}
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 400)
+			self.sendAddNodeRequest(url, n, 400)
 		for n in notFoundNodes:
-			data = {'typeName': n[0], 'name': n[1]}
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 404)
-	def testAddRelationshipBetweenNodes(self):
+			self.sendAddNodeRequest(url, n, 404)
+		for data in badAddNodePostData:
+			self.TestBadPostData(url, data)
+
+	def sendAddRelRequest(self, url, r, expected_code):
+		data = {
+			'fromType': r[0],
+			'fromName' : r[1],
+			'relName' : r[2],
+			'toType' : r[3],
+			'toName' : r[4]
+		}
+		response = requests.post(url, data)
+		self.assertEqual(response.status_code, expected_code)
+
+			
+	def TestAddRelationshipBetweenNodes(self):
 		url = baseurl + 'addRelationshipBetweenNodes'
 		self.assertEqual(requests.get(url).status_code, 400)
 		for r in rels:
-			data = {
-				'fromType': r[0],
-				'fromName' : r[1],
-				'relName' : r[2],
-				'toType' : r[3],
-				'toName' : r[4]
-			}
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 201)
-			response = requests.post(url, data)
-			self.assertEqual(response.status_code, 200)
-
-
-
-# #CREATE instance of meta
-# actor = db.createNode('actor', 'Daniel Craig')
-# role = db.createNode("role", "Daniel Craig")
-# character = db.createNode("character", 'James Bond')
-# movie = db.createNode("movie", "Skyfall")
-
-# actorHasRole = db.createRelationship(actor, "HAD_ROLE", role)
-# rolePlayed = db.createRelationship(role, "PLAYED", character)
-# roleProduction = db.createRelationship(role, "IN_PRODUCTION_OF", movie)
-
-# db.g.create(actor, role, character, movie, actorHasRole, rolePlayed, roleProduction)
-
-# class TestDbApi(unittest.TestCase):
-	
-# 	def testGetTypeNode(self):
-# 		self.assertEqual(db.getTypeNode('actor'), TypeActor)
-# 		self.assertEqual(db.getTypeNode('role'), TypeRole)
-	
-# 	def testGetNode(self):
-# 		self.assertEqual(db.getNode('actor', 'Daniel Craig'), actor)
-# 		self.assertEqual(db.getNode('role', 'Daniel Craig'), role)
-# 		self.assertEqual(db.getNode('character', 'James Bond'), character)
-# 		self.assertEqual(db.getNode('movie', 'Skyfall'), movie)
-
-# 	def testGetOutgoingRels(self):
-# 		rels = db.getOutgoingRels(role)
-# 		self.assertIn((u'IN_PRODUCTION_OF', u'movie', u'Skyfall'), rels)
-# 		self.assertIn((u'PLAYED', u'character', u'James Bond'), rels)
-
-# 	def testGetIncomingRels(self):
-# 		self.assertIn((u'HAD_ROLE', u'actor', u'Daniel Craig'), db.getIncomingRels(role))
+			self.sendAddRelRequest(url, r, 201)
+			self.sendAddRelRequest(url, r, 200)
 
 if __name__ == '__main__':
 	unittest.main()

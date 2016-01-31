@@ -56,8 +56,8 @@ def addPropertyToNode(request):
         not 'name' in request.POST or
         not 'propName' in request.POST or 
         not 'propValue' in request.POST):
-        return HttpResponse("You must specify a type, a name, a propName, and a propValue", status=400)
-    typeName = request.POST.get('type')
+        return HttpResponse("You must specify a typeName, a name, a propName, and a propValue", status=400)
+    typeName = request.POST.get('typeName')
     name = request.POST.get('name')
     if not nameRules.isValidTypeOrRelTypeName(typeName):
         return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
@@ -104,10 +104,11 @@ def addRelationshipBetweenNodes(request):
     nodeFrom = db.getNode(fromType, fromName)
     if nodeTo != None and nodeFrom != None:
         # Is a realtionship with this name in the meta?
-        if db.getRelationshipTypeNameBetweenTypeNodes(
+        possibleRels = db.getRelationshipTypeNamesBetweenTypeNodes(
             db.getTypeNode(fromType),
             db.getTypeNode(toType)
-            ) == relName:
+            )
+        if relName in possibleRels:
             if db.isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
                 return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
                     " already exists", status=200)
@@ -119,7 +120,7 @@ def addRelationshipBetweenNodes(request):
             # TODO make render page
             # What do we do if the relationship wasn't in the meta?
             return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
-                " wasn't in the meta.", status=404)
+                " wasn't in the meta. Possible relationships: "+str(possibleRels), status=404)
     else:
         return HttpResponse("Nodes couldn't be found: NodeFrom: "+
             nodeString(fromType, fromName)+" NodeTo: "+
@@ -201,7 +202,7 @@ def connectTypeNodes(request):
     elif relType == None:
         return HttpResponse("Couldn't find relType from name " + relName, status=400)
     else:
-        if relType['name'] == db.getRelationshipTypeNameBetweenTypeNodes(typeFromNode, typeToNode):
+        if relType['name'] in db.getRelationshipTypesNameBetweenTypeNodes(typeFromNode, typeToNode):
             return HttpResponse("Connection exists: " + typeFrom + " -> " + relName + " -> " + typeTo, status=200)
         else:
             db.connectTypeNodes(typeFromNode, relType, typeToNode)

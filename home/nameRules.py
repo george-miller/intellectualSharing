@@ -8,10 +8,10 @@ def isValidTypeOrRelTypeName(typeName):
 
 # Can only have letters, numbers, and spaces
 def isValidNodeName(nodeName):
-	letters = list(nodeName)
-	for letter in letters:
-		if not letter.isalnum() and not letter.isspace():
-			return False
+	# letters = list(nodeName)
+	# for letter in letters:
+	# 	if not letter.isalnum() and not letter.isspace():
+	# 		return False
 	return True
 
 # All typeNames and relTypes are title case

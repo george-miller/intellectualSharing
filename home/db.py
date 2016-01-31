@@ -30,11 +30,12 @@ def getRelationshipType(relName):
     result = g.cypher.execute("MATCH (n:RelationshipType {name: '" + relName + "'}) RETURN n")
     return findSingleNodeFromCypherResult(result)
    
-def getRelationshipTypeNameBetweenTypeNodes(fromType, toType):
+def getRelationshipTypeNamesBetweenTypeNodes(fromType, toType):
+    typeNames = []
     for rel in fromType.match("HAS_RELATIONSHIP"):
         if rel['forwardRelated'] == toType['name']:
-            return rel.end_node['name']
-    return None
+            typeNames.append(rel.end_node['name'])
+    return typeNames
 
 def getRelationshipTypeNames():
     result = g.cypher.execute("MATCH (n:RelationshipType) RETURN n")
