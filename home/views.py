@@ -202,7 +202,7 @@ def connectTypeNodes(request):
     elif relType == None:
         return HttpResponse("Couldn't find relType from name " + relName, status=400)
     else:
-        if relType['name'] in db.getRelationshipTypesNameBetweenTypeNodes(typeFromNode, typeToNode):
+        if relType['name'] in db.getRelationshipTypeNamesBetweenTypeNodes(typeFromNode, typeToNode):
             return HttpResponse("Connection exists: " + typeFrom + " -> " + relName + " -> " + typeTo, status=200)
         else:
             db.connectTypeNodes(typeFromNode, relType, typeToNode)

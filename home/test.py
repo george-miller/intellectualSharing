@@ -116,9 +116,9 @@ class MetaGet(unittest.TestCase):
 		for c in connections:
 			typeFrom = db.getTypeNode(c[0].title())
 			typeTo = db.getTypeNode(c[2].title())
-			self.assertEqual(
-				db.getRelationshipTypeNameBetweenTypeNodes(typeFrom, typeTo),
-				c[1].title()
+			self.assertIn(
+				c[1].title(),
+				db.getRelationshipTypeNamesBetweenTypeNodes(typeFrom, typeTo)
 			)
 
 
@@ -131,13 +131,13 @@ nodes = [
 	('award', 'Tony')
 ]
 badRequestNodes = [
-	('actor', '*)*#'),
 	('$$', 'Moneyyy'),
 	('TypeNode', 'Actor'),
 	('acto r', '____')
 ]
 notFoundNodes = [
 	('poop', 'poop'),
+	('acttor', '*)*#'),
 	('actorr', 'Baddie')
 ]
 
