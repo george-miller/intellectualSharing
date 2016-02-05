@@ -63,3 +63,14 @@ rels = [
 	('movie', 'Skyfall', 'has_genre', 'genre', 'action'),
 	('movie', 'Skyfall', 'awarded', 'award', 'Tony')
 ]
+
+movieRelationshipDict = {
+	'type' : u'Movie', 
+	'in' : [
+		{u'In_Production_Of' : u'Role'}
+	],
+	'out' : [
+		{u'Awarded': u'Award'},
+		{u'Has_Genre' : u'Genre'}
+	]
+}

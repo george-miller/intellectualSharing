@@ -7,6 +7,7 @@ class MetaGet(unittest.TestCase):
 		self.testTypeNodes()
 		self.testGetRelTypes()
 		self.testGetRelTypes()
+		self.testGetRelationshipDict()
 
 	def testTypeNodes(self):
 		for t in testData.types:
@@ -26,3 +27,7 @@ class MetaGet(unittest.TestCase):
 				c[1].title(),
 				db.getRelationshipTypeNamesBetweenTypeNodes(typeFrom, typeTo)
 			)
+
+	def testGetRelationshipDict(self):
+		movie = db.getTypeNode("Movie")
+		self.assertDictEqual(db.getRelationshipDict(movie), testData.movieRelationshipDict)

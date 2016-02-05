@@ -46,9 +46,11 @@ def runTests():
 	if result.wasSuccessful():
 		print Back.GREEN, "All completed Successfully", Style.RESET_ALL
 	for error in result.errors:
-		print Fore.YELLOW,error[0]
-		print error[1]
+		print Fore.YELLOW,error
 	for failure in result.failures:
-		print Fore.RED,error[0]
+		print Fore.RED, failure
 	print Style.RESET_ALL
 	return 0
+
+if __name__ == "__main__":
+	runTests()

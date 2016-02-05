@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^createTypeNode', views.createTypeNode, name='createTypeNode'),
     url(r'^createRelationshipType', views.createRelationshipType, name='createRelationshipType'),
     url(r'^connectTypeNodes', views.connectTypeNodes, name='connectTypeNodes'),
+    url(r'^getRelationshipDict', views.getRelationshipDict, name='getRelationshipDict'),
 ]

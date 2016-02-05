@@ -70,6 +70,19 @@ def connectTypeNodes(typeFrom, relType, typeTo):
     relToTo['backwardRelated'] = typeFrom['name']
     g.create(fromToRel, relToTo)
 
+def getRelationshipDict(typeNode):
+    d = {
+        'type' : typeNode['name'],
+        'in' : [],
+        'out' : []
+    }
+    for rel in typeNode.match("HAS_RELATIONSHIP"):
+        if type(rel['forwardRelated']) != type(None):
+            d['out'].append({rel.end_node['name'] : rel['forwardRelated']})
+        else:
+            d['in'].append({rel.start_node['name'] : rel['backwardRelated']})
+    return d
+
 
 # ----- NON META METHODS ------ 
 

@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import db
 import nameRules
@@ -207,6 +207,22 @@ def connectTypeNodes(request):
         else:
             db.connectTypeNodes(typeFromNode, relType, typeToNode)
             return HttpResponse("Connection created " + typeFrom + " -> " + relName + " -> " + typeTo, status=201)
+
+# Required POST data: 'typeName'
+def getRelationshipDict(request):
+    if request.method != 'POST':
+        return HttpResponse("Only POST requests supported", status=400)
+    if not 'typeName' in request.POST:
+        return HttpResponse("You must specify a typeName", status=400)
+    typeName = request.POST.get('typeName')
+    if not nameRules.isValidTypeOrRelTypeName(typeName):
+        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
+    typeNode = db.getTypeNode(typeName)
+    if typeNode == None:
+        return HttpResponse("TypeNode "+typeName+" couldn't be found", status=404)
+    else:
+        return JsonResponse(db.getRelationshipDict(typeNode), status=200)
+
 
 def typeNodeEditor(request):
     rels = db.getRelationshipTypeNames()
