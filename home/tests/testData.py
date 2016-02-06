@@ -67,10 +67,10 @@ rels = [
 movieRelationshipDict = {
 	'type' : u'Movie', 
 	'in' : [
-		{u'In_Production_Of' : u'Role'}
+		{u'Role' : u'In_Production_Of'}
 	],
 	'out' : [
-		{u'Awarded': u'Award'},
-		{u'Has_Genre' : u'Genre'}
+		{u'Award' : u'Awarded'},
+		{u'Genre' : u'Has_Genre'}
 	]
 }

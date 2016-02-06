@@ -78,9 +78,9 @@ def getRelationshipDict(typeNode):
     }
     for rel in typeNode.match("HAS_RELATIONSHIP"):
         if type(rel['forwardRelated']) != type(None):
-            d['out'].append({rel.end_node['name'] : rel['forwardRelated']})
+            d['out'].append({rel['forwardRelated'] : rel.end_node['name']})
         else:
-            d['in'].append({rel.start_node['name'] : rel['backwardRelated']})
+            d['in'].append({rel['backwardRelated'] : rel.start_node['name']})
     return d
 
 
