@@ -116,6 +116,7 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
 
 def getNode(typeName, name):
     typeName = typeName.title()
+    name = name.replace("'", "\\'")
     result = g.cypher.execute("MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n")
     return returnCypherResult(result)
 
