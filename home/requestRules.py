@@ -31,3 +31,11 @@ def checkNames(*names):
 		if not isValidTypeOrRelTypeName(name):
 			return HttpResponse(typeRuleMessage(name), status=400)
 	return True
+
+def twoNodesFound(request, nodeList, *excludedKeys):
+	possibleDifferentiators = deleteUsedKeys(request.POST.keys(), excludedKeys)
+
+def deleteUsedKeys(requestKeys, *excludedKeys):
+	for excludedKey in excludedKeys:
+		del requestKeys[requestKeys.index(excludedKey)]
+	return requestKeys

@@ -37,7 +37,8 @@ def runTests():
 	suite.addTests((
 		MetaCreate.MetaCreate(), 
 		MetaGet.MetaGet(), 
-		NodeCreate.NodeCreate()
+		NodeCreate.NodeCreate(),
+		RequestRulesTest.RequestRulesTest()
 	))
 
 	result = unittest.TestResult()

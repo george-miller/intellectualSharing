@@ -1,6 +1,8 @@
 import testData
 import unittest
 from .. import db
+import requests
+import json
 
 class MetaGet(unittest.TestCase):
 	def runTest(self):
@@ -29,5 +31,6 @@ class MetaGet(unittest.TestCase):
 			)
 
 	def testGetRelationshipDict(self):
-		movie = db.getTypeNode("Movie")
-		self.assertDictEqual(db.getRelationshipDict(movie), testData.movieRelationshipDict)
+		response = requests.post(testData.baseurl+'getRelationshipDict', {'typeName': 'Movie'})
+		json_response = json.loads(response.text)
+		self.assertDictEqual(json_response, testData.movieRelationshipDict)
