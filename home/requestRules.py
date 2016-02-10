@@ -32,10 +32,28 @@ def checkNames(*names):
 			return HttpResponse(typeRuleMessage(name), status=400)
 	return True
 
-def twoNodesFound(request, nodeList, *excludedKeys):
-	possibleDifferentiators = deleteUsedKeys(request.POST.keys(), excludedKeys)
+def multipleNodesFound(requestDict, nodeList):
+	hitsPerNode = []
+	for i in range(len(nodeList)):
+		hitsPerNode.append(0)
+		for key in nodeList[i].properties.keys():
+			if key in requestDict:
+				if nodeList[i].properties[key] == requestDict[key]:
+					hitsPerNode[i] += 1
 
-def deleteUsedKeys(requestKeys, *excludedKeys):
-	for excludedKey in excludedKeys:
-		del requestKeys[requestKeys.index(excludedKey)]
-	return requestKeys
+	maxHit = max(hitsPerNode)
+	maxPositions = [i for i,j in enumerate(hitsPerNode) if j==maxHit] # generates list of positions of maxes
+	if len(maxPositions) == 1:
+		return nodeList[maxPositions[0]]
+	else:
+		return None
+
+
+def getNodes(request, *nodes):
+	nodesToReturn = []
+	for node in nodes:
+		nodeResult = db.getNode(node[0], node[1])
+		if type(nodeResult) == type([]):
+			nodesToReturn.append(multipleNodesFound(dict(request.iteritems()), nodeResult))
+		else:
+			nodesToReturn.append(nodeResult)

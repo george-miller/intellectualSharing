@@ -74,3 +74,7 @@ movieRelationshipDict = {
 		u'Genre' : [u'Has_Genre']
 	}
 }
+
+multipleNodesRequestDict = {
+	u'typeName': u'Movie'
+}

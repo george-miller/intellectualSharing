@@ -18,9 +18,6 @@ def relString(relName, fromType, fromName, toType, toName):
     return "Relationship - " + relName + " from " + nodeString(fromType, fromName) + " to " + nodeString(toType, toName)
 
 def home(request):
-    r = request.POST.keys()
-    del r[r.index('typeName')]
-    print r
     return render(request, 'index.html')
 
 # ------ NON-META API ------
@@ -39,10 +36,7 @@ def addNode(request):
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call, try /createTypeNode", status=400)
     typeNode = db.getTypeNode(typeName)
-    if type(typeNode) == type([]):
-        # Delete typeName and name,  look for any other key to match to a prop
-        requestRules.twoNodesFound(request, typeNode, 'type', 'name')
-        return HttpResponse()
+
     if typeNode != None:
         node = db.getNode(typeName, name)
         if node == None:
@@ -78,7 +72,7 @@ def addRelationshipBetweenNodes(request):
     parseResult = requestRules.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
     if parseResult[0] == False:
         return parseResult[1]
-    (toType, toName, fromType, fromName, relName) = parseResult
+    [toType, toName, fromType, fromName, relName] = parseResult
 
     relName = requestRules.fixTypeOrRelTypeNameCases(relName)
 
@@ -136,7 +130,7 @@ def createTypeNode(request):
     parseResult = requestRules.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
-    typeName = parseResult[0]
+    [typeName] = parseResult
 
     checkNameResult = requestRules.checkNames(typeName)
     if checkNameResult != True:
@@ -154,7 +148,7 @@ def createRelationshipType(request):
     parseResult = requestRules.parsePostRequest(request, 'relName')
     if parseResult[0] == False:
         return parseResult[1]
-    relName = parseResult[0]
+    [relName] = parseResult
 
     checkNameResult = requestRules.checkNames(relName)
     if checkNameResult != True:
@@ -172,7 +166,7 @@ def connectTypeNodes(request):
     parseResult = requestRules.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
     if parseResult[0] == False:
         return parseResult[1]
-    (typeFrom, relName, typeTo) = parseResult
+    [typeFrom, relName, typeTo] = parseResult
 
     checkNameResult = requestRules.checkNames(typeFrom, relName, typeTo)
     if checkNameResult != True:

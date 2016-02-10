@@ -6,7 +6,7 @@ from py2neo import *
 import unittest
 import requests
 from .. import db
-from . import data, MetaCreate, MetaGet, NodeCreate
+from . import data, MetaCreate, MetaGet, NodeCreate, RequestRulesTest
 from colorama import init
 from colorama import Fore, Back, Style
 init()
