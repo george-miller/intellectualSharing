@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import db
-import nameRules
+import requestRules
 
 #TODO check if node/relationship is in DB before adding it.
 #TODO TESTS
@@ -24,49 +24,41 @@ def home(request):
 
 # POST data must contain 'typeName' and 'name'
 def addNode(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if not 'typeName' in request.POST or not 'name' in request.POST:
-        return HttpResponse("You must specify a typeName and a name", status=400)
-    typeName = request.POST.get('typeName')
-    if not nameRules.isValidTypeOrRelTypeName(typeName):
-        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'typeName', 'name')
+    if parseResult[0] == False:
+        return parseResult[1]
+    (typeName, name) = parseResult
+
+    checkNameResult = requestRules.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call, try /createTypeNode", status=400)
     typeNode = db.getTypeNode(typeName)
     if typeNode != None:
-        name = request.POST.get('name')
-        if not nameRules.isValidNodeName(name):
-            return HttpResponse(nameRules.nodeRuleMessage(name), status=400)
+        node = db.getNode(typeName, name)
+        if node == None:
+            db.createNode(typeName, name)
+            return HttpResponse(nodeString(typeName, name)+" created", status=201)
         else:
-            node = db.getNode(typeName, name)
-            if node == None:
-                db.createNode(typeName, name)
-                return HttpResponse(nodeString(typeName, name)+" created", status=201)
-            else:
-                return HttpResponse(nodeString(typeName, name)+" exists", status=200)
+            return HttpResponse(nodeString(typeName, name)+" exists", status=200)
     else:
         return HttpResponse("Type node not found with typeName " + typeName, status=404)
 
 # required POST data: 'typeName', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if (not 'typeName' in request.POST or 
-        not 'name' in request.POST or
-        not 'propName' in request.POST or 
-        not 'propValue' in request.POST):
-        return HttpResponse("You must specify a typeName, a name, a propName, and a propValue", status=400)
-    typeName = request.POST.get('typeName')
-    name = request.POST.get('name')
-    if not nameRules.isValidTypeOrRelTypeName(typeName):
-        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
-    if not nameRules.isValidNodeName(name):
-        return HttpResponse(nameRules.nodeRuleMessage(name), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
+    if parseResult[0] == False:
+        return parseResult[1]
+    (typeName, name, propName, propValue) = parseResult
+
+    checkNameResult = requestRules.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
     node = db.getNode(typeName, name)
     if node != None:
-        propName = request.POST.get('propName')
-        propValue = request.POST.get('propValue')
         node[propName] = propValue
         node.push()
         return HttpResponse('Property '+propName+' : '+propValue+
@@ -76,30 +68,17 @@ def addPropertyToNode(request):
 
 # POST data must contain 'toType', 'toName', 'fromType', 'fromName', 'relName'
 def addRelationshipBetweenNodes(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if (not 'toType' in request.POST or 
-        not 'toName' in request.POST or
-        not 'fromType' in request.POST or 
-        not 'fromName' in request.POST or
-        not 'relName' in request.POST):
-        return HttpResponse("You must specify a toType, a toName, a fromType, a fromName, and a relName", status=400)
-    toType = request.POST.get('toType')
-    toName = request.POST.get('toName')
-    fromType = request.POST.get('fromType')
-    fromName = request.POST.get('fromName')
-    relName = request.POST.get('relName')
-    relName = relName.title()
-    if not nameRules.isValidTypeOrRelTypeName(toType):
-        return HttpResponse(nameRules.typeRuleMessage(toType), status=400)
-    if not nameRules.isValidNodeName(toName):
-        return HttpResponse(nameRules.nodeRuleMessage(toName), status=400)
-    if not nameRules.isValidTypeOrRelTypeName(fromType):
-        return HttpResponse(nameRules.typeRuleMessage(fromType), status=400)
-    if not nameRules.isValidNodeName(fromName):
-        return HttpResponse(nameRules.nodeRuleMessage(fromName), status=400)
-    if not nameRules.isValidTypeOrRelTypeName(relName):
-        return HttpResponse(nameRules.typeRuleMessage(relName), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
+    if parseResult[0] == False:
+        return parseResult[1]
+    (toType, toName, fromType, fromName, relName) = parseResult
+
+    relName = requestRules.fixTypeOrRelTypeNameCases(relName)
+
+    checkNameResult = requestRules.checkNames(toType, fromType, relName)
+    if checkNameResult != True:
+        return checkNameResult
+
     nodeTo = db.getNode(toType, toName)
     nodeFrom = db.getNode(fromType, fromName)
     if nodeTo != None and nodeFrom != None:
@@ -128,8 +107,10 @@ def addRelationshipBetweenNodes(request):
 
 def viewNode(request, typeName, name):
     node = db.getNode(typeName, name)
-    if not nameRules.isValidTypeOrRelTypeName(typeName):
-        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
+    checkNameResult = requestRules.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
     if node != None:
         return render(request, 'node.html', 
             {"nodeType": node.labels.pop(),
@@ -145,13 +126,15 @@ def viewNode(request, typeName, name):
 
 # Required POST data: 'typeName'
 def createTypeNode(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if not 'typeName' in request.POST:
-        return HttpResponse("You must specify a typeName", status=400)
-    typeName = request.POST.get('typeName')
-    if not nameRules.isValidTypeOrRelTypeName(typeName):
-        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'typeName')
+    if parseResult[0] == False:
+        return parseResult[1]
+    typeName = parseResult[0]
+
+    checkNameResult = requestRules.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
     typeNode = db.getTypeNode(typeName)
     if typeNode == None:
         db.createTypeNode(typeName)
@@ -161,13 +144,15 @@ def createTypeNode(request):
 
 # Required POST data: 'relName'
 def createRelationshipType(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if not 'relName' in request.POST:
-        return HttpResponse("You must specify a relName", status=400)
-    relName = request.POST.get('relName')
-    if not nameRules.isValidTypeOrRelTypeName(relName):
-        return HttpResponse(nameRules.typeRuleMessage(relName), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'relName')
+    if parseResult[0] == False:
+        return parseResult[1]
+    relName = parseResult[0]
+
+    checkNameResult = requestRules.checkNames(relName)
+    if checkNameResult != True:
+        return checkNameResult
+
     relType = db.getRelationshipType(relName)
     if relType == None:
         db.createRelationshipType(relName)
@@ -177,21 +162,15 @@ def createRelationshipType(request):
 
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
 def connectTypeNodes(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if (not 'relName' in request.POST or
-        not 'typeFrom' in request.POST or
-        not 'typeTo' in request.POST):
-        return HttpResponse("You must specify a relName, typeFrom, and typeTo", status=400)
-    typeFrom = request.POST.get('typeFrom')
-    relName = request.POST.get('relName')
-    typeTo = request.POST.get('typeTo')
-    if not nameRules.isValidTypeOrRelTypeName(typeFrom):
-        return HttpResponse(nameRules.typeRuleMessage(typeFrom), status=400)
-    if not nameRules.isValidTypeOrRelTypeName(relName):
-        return HttpResponse(nameRules.typeRuleMessage(relName), status=400)
-    if not nameRules.isValidTypeOrRelTypeName(typeTo):
-        return HttpResponse(nameRules.typeRuleMessage(typeTo), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
+    if parseResult[0] == False:
+        return parseResult[1]
+    (typeFrom, relName, typeTo) = parseResult
+
+    checkNameResult = requestRules.checkNames(typeFrom, relName, typeTo)
+    if checkNameResult != True:
+        return checkNameResult
+
     typeFromNode = db.getTypeNode(typeFrom)
     typeToNode = db.getTypeNode(typeTo)
     relType = db.getRelationshipType(relName)
@@ -210,13 +189,15 @@ def connectTypeNodes(request):
 
 # Required POST data: 'typeName'
 def getRelationshipDict(request):
-    if request.method != 'POST':
-        return HttpResponse("Only POST requests supported", status=400)
-    if not 'typeName' in request.POST:
-        return HttpResponse("You must specify a typeName", status=400)
-    typeName = request.POST.get('typeName')
-    if not nameRules.isValidTypeOrRelTypeName(typeName):
-        return HttpResponse(nameRules.typeRuleMessage(typeName), status=400)
+    parseResult = requestRules.parsePostRequest(request, 'typeName')
+    if parseResult[0] == False:
+        return parseResult[1]
+    typeName = parseResult
+
+    checkNameResult = requestRules.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
     typeNode = db.getTypeNode(typeName)
     if typeNode == None:
         return HttpResponse("TypeNode "+typeName+" couldn't be found", status=404)
@@ -228,5 +209,3 @@ def typeNodeEditor(request):
     rels = db.getRelationshipTypeNames()
     types = db.getTypeNames()
     return render(request, 'typeNodeEditor.html', {"rels":rels, "types":types})
-
-

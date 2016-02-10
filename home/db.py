@@ -8,27 +8,30 @@ g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
 # NOTE: Most methods take instances of Node as arguments, except for the ones that create new Nodes/Relationships
 
 # Helpful method to parse a cypher result
-def findSingleNodeFromCypherResult(result):
-    order = result.to_subgraph().order
+def returnCypherResult(result):
+    subGraph = result.to_subgraph()
+    order = subGraph.order
     if order == 0:
         return None
     elif order == 1:
         return result[0][0]
     else:
-        print "Error multiple nodes found when single node expected in " + str(result)
-        return None
+        nodes = []
+        for node in subGraph.nodes:
+            nodes.append(node)
+        return nodes
 
 # --- META METHODS ---
 
 def getTypeNode(typeName):
     typeName = typeName.title()
     result = g.cypher.execute("MATCH (n:TypeNode {name:'" + typeName + "'}) RETURN n")
-    return findSingleNodeFromCypherResult(result)
+    return returnCypherResult(result)
 
 def getRelationshipType(relName):
     relName = relName.title()
     result = g.cypher.execute("MATCH (n:RelationshipType {name: '" + relName + "'}) RETURN n")
-    return findSingleNodeFromCypherResult(result)
+    return returnCypherResult(result)
    
 def getRelationshipTypeNamesBetweenTypeNodes(fromType, toType):
     typeNames = []
@@ -73,14 +76,20 @@ def connectTypeNodes(typeFrom, relType, typeTo):
 def getRelationshipDict(typeNode):
     d = {
         'type' : typeNode['name'],
-        'in' : [],
-        'out' : []
+        'in' : {},
+        'out' : {}
     }
     for rel in typeNode.match("HAS_RELATIONSHIP"):
         if type(rel['forwardRelated']) != type(None):
-            d['out'].append({rel['forwardRelated'] : rel.end_node['name']})
+            if rel['forwardRelated'] in d['out'].keys():
+                d['out'][rel['forwardRelated']].append(rel.end_node['name'])
+            else:
+                d['out'][rel['forwardRelated']]  = [rel.end_node['name']]
         else:
-            d['in'].append({rel['backwardRelated'] : rel.start_node['name']})
+            if rel['backwardRelated'] in d['in'].keys():
+                d['in'][rel['backwardRelated']].append(rel.start_node['name'])
+            else:
+                d['in'][rel['backwardRelated']] = [rel.start_node['name']]
     return d
 
 
@@ -108,7 +117,7 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
 def getNode(typeName, name):
     typeName = typeName.title()
     result = g.cypher.execute("MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n")
-    return findSingleNodeFromCypherResult(result)
+    return returnCypherResult(result)
 
 def getOutgoingRels(node):
     if 'TypeNode' in node.labels:
