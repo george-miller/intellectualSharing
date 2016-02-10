@@ -192,7 +192,7 @@ def getRelationshipDict(request):
     parseResult = requestRules.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
-    typeName = parseResult
+    typeName = parseResult[0]
 
     checkNameResult = requestRules.checkNames(typeName)
     if checkNameResult != True:
