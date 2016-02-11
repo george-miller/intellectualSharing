@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import db
-import requestRules
+import viewsHelper
 
 #TODO check if node/relationship is in DB before adding it.
 #TODO TESTS
@@ -24,21 +24,21 @@ def home(request):
 
 # POST data must contain 'typeName' and 'name'
 def addNode(request):
-    parseResult = requestRules.parsePostRequest(request, 'typeName', 'name')
+    parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name')
     if parseResult[0] == False:
         return parseResult[1]
     (typeName, name) = parseResult
 
-    checkNameResult = requestRules.checkNames(typeName)
+    checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call, try /createTypeNode", status=400)
-    typeNode = db.getTypeNode(typeName)
+
+    [typeNode, node] = viewsHelper.getNodes(request, ['TypeNode', typeName], [typeName, name])
 
     if typeNode != None:
-        node = db.getNode(typeName, name)
         if node == None:
             db.createNode(typeName, name)
             return HttpResponse(nodeString(typeName, name)+" created", status=201)
@@ -49,16 +49,16 @@ def addNode(request):
 
 # required POST data: 'typeName', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
-    parseResult = requestRules.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
+    parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
     if parseResult[0] == False:
         return parseResult[1]
-    (typeName, name, propName, propValue) = parseResult
+    [typeName, name, propName, propValue] = parseResult
 
-    checkNameResult = requestRules.checkNames(typeName)
+    checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
-    node = db.getNode(typeName, name)
+    [node] = viewsHelper.getNodes(request, [typeName, name])
     if node != None:
         node[propName] = propValue
         node.push()
@@ -69,49 +69,52 @@ def addPropertyToNode(request):
 
 # POST data must contain 'toType', 'toName', 'fromType', 'fromName', 'relName'
 def addRelationshipBetweenNodes(request):
-    parseResult = requestRules.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
+    parseResult = viewsHelper.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
     if parseResult[0] == False:
         return parseResult[1]
     [toType, toName, fromType, fromName, relName] = parseResult
 
-    relName = requestRules.fixTypeOrRelTypeNameCases(relName)
+    relName = viewsHelper.fixTypeOrRelTypeNameCases(relName)
 
-    checkNameResult = requestRules.checkNames(toType, fromType, relName)
+    checkNameResult = viewsHelper.checkNames(toType, fromType, relName)
     if checkNameResult != True:
         return checkNameResult
 
-    nodeTo = db.getNode(toType, toName)
-    nodeFrom = db.getNode(fromType, fromName)
+    [nodeFrom, nodeTo,  fromTypeNode, toTypeNode] = viewsHelper.getNodes(request, 
+        [fromType, fromName], [toType, toName], ['TypeNode', fromType], ['TypeNode', toType])
     if nodeTo != None and nodeFrom != None:
-        # Is a realtionship with this name in the meta?
-        possibleRels = db.getRelationshipTypeNamesBetweenTypeNodes(
-            db.getTypeNode(fromType),
-            db.getTypeNode(toType)
-            )
-        if relName in possibleRels:
-            if db.isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
-                return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
-                    " already exists", status=200)
+        if fromTypeNode != None and toTypeNode != None:
+            # Is a realtionship with this name in the meta?
+            possibleRels = db.getRelationshipTypeNamesBetweenTypeNodes(
+                fromTypeNode,
+                toTypeNode
+                )
+            if relName in possibleRels:
+                if db.isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
+                    return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
+                        " already exists", status=200)
+                else:
+                    db.createRelationship(nodeFrom, relName, nodeTo)
+                    return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
+                        " created successfully!", status=201)
             else:
-                db.createRelationship(nodeFrom, relName, nodeTo)
+                # TODO make render page
+                # What do we do if the relationship wasn't in the meta?
                 return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
-                    " created successfully!", status=201)
+                    " wasn't in the meta. Possible relationships: "+str(possibleRels), status=404)
         else:
-            # TODO make render page
-            # What do we do if the relationship wasn't in the meta?
-            return HttpResponse(relString(relName, fromType, fromName, toType, toName)+
-                " wasn't in the meta. Possible relationships: "+str(possibleRels), status=404)
+            return HttpResponse("TypeNodes couldn't be found for types: "+fromType+" and "+toTypeNode, status=404)
     else:
         return HttpResponse("Nodes couldn't be found: NodeFrom: "+
             nodeString(fromType, fromName)+" NodeTo: "+
             nodeString(toType, toName), status=404)
 
 def viewNode(request, typeName, name):
-    node = db.getNode(typeName, name)
-    checkNameResult = requestRules.checkNames(typeName)
+    checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
+    [node] = viewsHelper.getNodes(request, [typeName, name])
     if node != None:
         return render(request, 'node.html', 
             {"nodeType": node.labels.pop(),
@@ -127,16 +130,16 @@ def viewNode(request, typeName, name):
 
 # Required POST data: 'typeName'
 def createTypeNode(request):
-    parseResult = requestRules.parsePostRequest(request, 'typeName')
+    parseResult = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
     [typeName] = parseResult
 
-    checkNameResult = requestRules.checkNames(typeName)
+    checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
-    typeNode = db.getTypeNode(typeName)
+    [typeNode] = viewsHelper.getNodes(request, ['TypeNode', typeName])
     if typeNode == None:
         db.createTypeNode(typeName)
         return HttpResponse("Type Node "+typeName+" created", status=201)
@@ -145,16 +148,17 @@ def createTypeNode(request):
 
 # Required POST data: 'relName'
 def createRelationshipType(request):
-    parseResult = requestRules.parsePostRequest(request, 'relName')
+    parseResult = viewsHelper.parsePostRequest(request, 'relName')
     if parseResult[0] == False:
         return parseResult[1]
     [relName] = parseResult
 
-    checkNameResult = requestRules.checkNames(relName)
+    checkNameResult = viewsHelper.checkNames(relName)
     if checkNameResult != True:
         return checkNameResult
 
-    relType = db.getRelationshipType(relName)
+    [relType] = viewsHelper.getNodes(request, ['RelationshipType', relName])
+    print relName+str(relType)
     if relType == None:
         db.createRelationshipType(relName)
         return HttpResponse("Relationship Type "+relName+" created", status=201)
@@ -163,18 +167,18 @@ def createRelationshipType(request):
 
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
 def connectTypeNodes(request):
-    parseResult = requestRules.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
+    parseResult = viewsHelper.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
     if parseResult[0] == False:
         return parseResult[1]
     [typeFrom, relName, typeTo] = parseResult
 
-    checkNameResult = requestRules.checkNames(typeFrom, relName, typeTo)
+    checkNameResult = viewsHelper.checkNames(typeFrom, relName, typeTo)
     if checkNameResult != True:
         return checkNameResult
 
-    typeFromNode = db.getTypeNode(typeFrom)
-    typeToNode = db.getTypeNode(typeTo)
-    relType = db.getRelationshipType(relName)
+    [typeFromNode, typeToNode, relType] = viewsHelper.getNodes(request, 
+        ['TypeNode', typeFrom], ['TypeNode', typeTo], ['RelationshipType', relName])
+
     if typeFromNode == None:
         return HttpResponse("Couldn't find typeFrom " + typeFrom, status=400)
     elif typeToNode == None:
@@ -190,16 +194,16 @@ def connectTypeNodes(request):
 
 # Required POST data: 'typeName'
 def getRelationshipDict(request):
-    parseResult = requestRules.parsePostRequest(request, 'typeName')
+    parseResult = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
     typeName = parseResult[0]
 
-    checkNameResult = requestRules.checkNames(typeName)
+    checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
-    typeNode = db.getTypeNode(typeName)
+    [typeNode] = viewsHelper.getNodes(request, ['TypeNode', typeName])
     if typeNode == None:
         return HttpResponse("TypeNode "+typeName+" couldn't be found", status=404)
     else:

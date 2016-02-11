@@ -1,4 +1,5 @@
 from django.http import HttpResponse, JsonResponse
+import db
 
 # Can only have letters, numbers and '_'
 def isValidTypeOrRelTypeName(typeName):
@@ -52,8 +53,16 @@ def multipleNodesFound(requestDict, nodeList):
 def getNodes(request, *nodes):
 	nodesToReturn = []
 	for node in nodes:
-		nodeResult = db.getNode(node[0], node[1])
+		nodeResult = None
+		if node[0] == 'TypeNode':
+			nodeResult = db.getTypeNode(node[1])
+		elif node[0] == 'RelationshipType':
+			nodeResult = db.getRelationshipType(node[1])
+		else:
+			nodeResult = db.getNode(node[0], node[1])
 		if type(nodeResult) == type([]):
 			nodesToReturn.append(multipleNodesFound(dict(request.iteritems()), nodeResult))
 		else:
 			nodesToReturn.append(nodeResult)
+	return nodesToReturn
+
