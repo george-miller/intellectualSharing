@@ -38,14 +38,18 @@ def addNode(request):
 
     [typeNode, node] = viewsHelper.getNodes(request, ['TypeNode', typeName], [typeName, name])
 
-    if typeNode != None:
+    if typeNode == None:
+        return HttpResponse("Type node not found with typeName " + typeName, status=404)
+    elif type(typeNode).__name__ == 'HttpResponse':
+        return typeNode
+    else:
         if node == None:
             db.createNode(typeName, name)
             return HttpResponse(nodeString(typeName, name)+" created", status=201)
+        elif type(node).__name__ == 'HttpResponse':
+            return node
         else:
             return HttpResponse(nodeString(typeName, name)+" exists", status=200)
-    else:
-        return HttpResponse("Type node not found with typeName " + typeName, status=404)
 
 # required POST data: 'typeName', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):

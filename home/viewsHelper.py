@@ -47,7 +47,10 @@ def multipleNodesFound(requestDict, nodeList):
 	if len(maxPositions) == 1:
 		return nodeList[maxPositions[0]]
 	else:
-		return None
+		nodesWithSameHits = []
+		for position in maxPositions:
+			nodesWithSameHits.append(nodeList[position])
+		return HttpResponse("Couldn't differentiate between nodes: " + str(nodesWithSameHits), status=409)
 
 
 def getNodes(request, *nodes):
