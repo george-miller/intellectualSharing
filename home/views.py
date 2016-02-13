@@ -18,7 +18,7 @@ def relString(relName, fromType, fromName, toType, toName):
     return "Relationship - " + relName + " from " + nodeString(fromType, fromName) + " to " + nodeString(toType, toName)
 
 def home(request):
-    return render(request, 'index.html')
+    return render(request, 'is.html')
 
 # ------ NON-META API ------
 
@@ -117,7 +117,11 @@ def addRelationshipBetweenNodes(request):
             nodeString(fromType, fromName)+" NodeTo: "+
             nodeString(toType, toName), status=404)
 
-def viewNode(request, typeName, name):
+def viewNode(request):
+    typeName = request.GET.get('typeName')
+    name = request.GET.get('name')
+
+
     checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult

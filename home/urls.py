@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^addPropertyToNode', views.addPropertyToNode, name='addPropertyToNode'),
 
     #Node Lookup URL with label and id variables
-    url(r'^viewNode/(?P<typeName>.+)/(?P<name>.+)/', views.viewNode, name='viewNode'),
+    url(r'^viewNode', views.viewNode, name='viewNode'),
 
     # META API
     url(r'^typeNodeEditor', views.typeNodeEditor, name='typeNodeEditor'),
