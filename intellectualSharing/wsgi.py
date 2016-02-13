@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 
 import os
 import sys
-sys.path.append("/home/david/IntellectualSharing/")
+sys.path.append("/home/gmmotto/repos/intellectualSharing/")
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "intellectualSharing.settings")
 

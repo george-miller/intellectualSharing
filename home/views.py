@@ -22,6 +22,7 @@ def home(request):
 
 # ------ NON-META API ------
 
+#TODO add properties to request
 # POST data must contain 'typeName' and 'name'
 def addNode(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name')
@@ -36,6 +37,8 @@ def addNode(request):
     if typeName == 'TypeNode':
         return HttpResponse("You may not create a meta node with this API call, try /createTypeNode", status=400)
 
+    #TODO properties could differentiate
+    # find single match of property, that is a match
     [typeNode, node] = viewsHelper.getNodes(request, ['TypeNode', typeName], [typeName, name])
 
     if typeNode == None:
@@ -51,6 +54,7 @@ def addNode(request):
         else:
             return HttpResponse(nodeString(typeName, name)+" exists", status=200)
 
+#TODO Mutliple Property Request
 # required POST data: 'typeName', 'name', 'propName', 'propValue'           
 def addPropertyToNode(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
