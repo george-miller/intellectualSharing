@@ -1,7 +1,7 @@
 import testData
 import unittest
 import requests
-from .. import requestRules
+from .. import viewsHelper
 from .. import db
 
 class RequestRulesTest(unittest.TestCase):
@@ -19,16 +19,16 @@ class RequestRulesTest(unittest.TestCase):
 		self.testThreeNodesFound()
 
 	def testTwoNodesFound(self):
-		result = requestRules.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
+		result = viewsHelper.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
 		self.assertEqual(result, None)
 		testData.multipleNodesRequestDict['helper'] = 'Fucntion'
-		result = requestRules.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
+		result = viewsHelper.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
 		self.assertEqual(result, self.twoNodes[0])
 		del testData.multipleNodesRequestDict['helper']
 
 	def testThreeNodesFound(self):
-		result = requestRules.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
+		result = viewsHelper.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
 		self.assertEqual(result, None)
 		testData.multipleNodesRequestDict['example'] = 'property'
-		result = requestRules.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
+		result = viewsHelper.multipleNodesFound(testData.multipleNodesRequestDict, self.twoNodes)
 		self.assertEqual(result, self.threeNodes[2])

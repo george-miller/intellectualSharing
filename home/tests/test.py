@@ -6,7 +6,7 @@ from py2neo import *
 import unittest
 import requests
 from .. import db
-from . import data, MetaCreate, MetaGet, NodeCreate, RequestRulesTest
+from . import testData, MetaCreate, MetaGet, NodeCreate, RequestRulesTest
 from colorama import init
 from colorama import Fore, Back, Style
 init()
@@ -17,13 +17,13 @@ def runTests():
 		return 0
 
 	try:
-		result = requests.get(data.baseurl).status_code
+		result = requests.get(testData.baseurl).status_code
 	except:
-		print "Server isn't responding at " + data.baseurl
+		print "Server isn't responding at " + testData.baseurl
 		return 1
 	else:
 		if result != 200:
-			print "Server didn't give 200 response " + data.baseurl
+			print "Server didn't give 200 response " + testData.baseurl
 			return 1
 	try:
 		db.g = Graph('http://neo4j:django@127.0.0.1:7474/db/data')
