@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 import db
 import viewsHelper
 
@@ -17,6 +18,7 @@ def home(request):
 
 #TODO add properties to request
 # POST data must contain 'typeName' and 'name'
+@csrf_exempt
 def addNode(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name')
     if parseResult[0] == False:
@@ -44,7 +46,8 @@ def addNode(request):
             return HttpResponse(nodeString(typeName, name)+" exists", status=200)
 
 #TODO Mutliple Property Request
-# required POST data: 'typeName', 'name', 'propName', 'propValue'           
+# required POST data: 'typeName', 'name', 'propName', 'propValue' 
+@csrf_exempt          
 def addPropertyToNode(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
     if parseResult[0] == False:
@@ -65,6 +68,7 @@ def addPropertyToNode(request):
         return HttpResponse(nodeString(typeName, name)+" was not found", status=404)
 
 # POST data must contain 'toType', 'toName', 'fromType', 'fromName', 'relName'
+@csrf_exempt
 def addRelationshipBetweenNodes(request):
     parseResult = viewsHelper.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
     if parseResult[0] == False:
@@ -106,6 +110,7 @@ def addRelationshipBetweenNodes(request):
             nodeString(fromType, fromName)+" NodeTo: "+
             nodeString(toType, toName), status=404)
 
+
 def viewNode(request):
     typeName = request.GET.get('typeName')
     name = request.GET.get('name')
@@ -130,6 +135,7 @@ def viewNode(request):
 # ----- META API ------
 
 # Required POST data: 'typeName'
+@csrf_exempt
 def createTypeNode(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
@@ -148,6 +154,7 @@ def createTypeNode(request):
         return HttpResponse("Type Node "+typeName+" exists", status=200)
 
 # Required POST data: 'relName'
+@csrf_exempt
 def createRelationshipType(request):
     parseResult = viewsHelper.parsePostRequest(request, 'relName')
     if parseResult[0] == False:
@@ -167,6 +174,7 @@ def createRelationshipType(request):
         return HttpResponse("Relationship Type "+relName+" exists", status=200)
 
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
+@csrf_exempt
 def connectTypeNodes(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
     if parseResult[0] == False:
@@ -194,6 +202,7 @@ def connectTypeNodes(request):
             return HttpResponse("Connection created " + typeFrom + " -> " + relName + " -> " + typeTo, status=201)
 
 # Required POST data: 'typeName'
+@csrf_exempt
 def getRelationshipDict(request):
     parseResult = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
