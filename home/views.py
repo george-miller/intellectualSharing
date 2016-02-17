@@ -3,13 +3,6 @@ from django.shortcuts import render
 import db
 import viewsHelper
 
-#TODO check if node/relationship is in DB before adding it.
-#TODO TESTS
-#TODO Strict input checking
-#TODO allow reverse direction relationships
-
-#TODO Save name with input cases, then when trying to access a node, match to any node with with the same letters regardless of case
-#TODO Edit worldfromscratch
 
 def nodeString(typeName, name):
     return "Node - " + typeName + " : " + name
@@ -43,14 +36,10 @@ def addNode(request):
 
     if typeNode == None:
         return HttpResponse("Type node not found with typeName " + typeName, status=404)
-    elif type(typeNode).__name__ == 'HttpResponse':
-        return typeNode
     else:
         if node == None:
             db.createNode(typeName, name)
             return HttpResponse(nodeString(typeName, name)+" created", status=201)
-        elif type(node).__name__ == 'HttpResponse':
-            return node
         else:
             return HttpResponse(nodeString(typeName, name)+" exists", status=200)
 
