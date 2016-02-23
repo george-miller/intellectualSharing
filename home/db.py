@@ -95,9 +95,11 @@ def getRelationshipDict(typeNode):
 
 # ----- NON META METHODS ------ 
 
-def createNode(typeName, name):
+def createNode(typeName, name, properties=None):
     typeName = typeName.title()
     node = Node(typeName, name=name)
+    for key in properties.keys():
+        node[key] = properties[key]
     g.create(node)
     return node
 

@@ -19,13 +19,21 @@ def typeRuleMessage(typeName):
 def parsePostRequest(request, *keys):
 	if request.method != 'POST':
 		return (False, HttpResponse("Only POST requests supported", status=400))
+	differentiators = {}
 	keyValues = []
-	for key in keys:
-		if not key in request.POST:
-			return (False, HttpResponse("You must specify these keys: " + str(keys), status=400))
+	keysFound = 0
+	for key in request.POST.keys():
+		key = str(key)
+		if key not in keys:
+			differentiators[key] = request.POST.get(key)
 		else:
 			keyValues.append(request.POST.get(key))
-	return keyValues	
+			keysFound += 1
+
+	if len(keys) > keysFound:
+		keyValues = (False, HttpResponse("You must specify these keys: " + str(keys), status=400))
+
+	return (keyValues, differentiators)	
 
 def checkNames(*names):
 	for name in names:
@@ -54,19 +62,29 @@ def multipleNodesFound(requestDict, nodeList):
 		return None
 
 
-def getNodes(request, *nodes):
+def getNodes(onlySuperset, differentiators, *nodes):
 	nodesToReturn = []
 	for node in nodes:
-		nodeResult = None
 		if node[0] == 'TypeNode':
-			nodeResult = db.getTypeNode(node[1])
+			nodesToReturn.append(db.getTypeNode(node[1]))
 		elif node[0] == 'RelationshipType':
-			nodeResult = db.getRelationshipType(node[1])
+			nodesToReturn.append(db.getRelationshipType(node[1]))
 		else:
-			nodeResult = db.getNode(node[0], node[1])
-		if type(nodeResult) == type([]):
-			nodesToReturn.append(multipleNodesFound(dict(request.iteritems()), nodeResult))
-		else:
-			nodesToReturn.append(nodeResult)
+			nodesToReturn.append(getNonMetaNode(onlySuperset, differentiators, db.getNode(node[0], node[1])))
 	return nodesToReturn
 
+def getNonMetaNode(onlySuperset, differentiators, node):
+	if type(node) == type([]):
+		return multipleNodesFound(differentiators, node)
+	elif onlySuperset and node != None and isDifferent(differentiators, node):
+		print differentiators
+		print node
+		return None
+	else:
+		return node
+
+def isDifferent(differentiators, node):
+	for key in differentiators.keys():
+		if key not in node.properties.keys():
+			return True
+	return False

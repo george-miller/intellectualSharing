@@ -16,11 +16,12 @@ def home(request):
 
 # ------ NON-META API ------
 
-#TODO add properties to request
+# TODO add properties to request
 # POST data must contain 'typeName' and 'name'
 @csrf_exempt
 def addNode(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeName', 'name')
+    print parseResult
     if parseResult[0] == False:
         return parseResult[1]
     (typeName, name) = parseResult
@@ -34,13 +35,13 @@ def addNode(request):
 
     #TODO properties could differentiate
     # find single match of property, that is a match
-    [typeNode, node] = viewsHelper.getNodes(request, ['TypeNode', typeName], [typeName, name])
+    [typeNode, node] = viewsHelper.getNodes(True, differentiators, ['TypeNode', typeName], [typeName, name])
 
     if typeNode == None:
         return HttpResponse("Type node not found with typeName " + typeName, status=404)
     else:
         if node == None:
-            db.createNode(typeName, name)
+            db.createNode(typeName, name, dict(request.POST.iteritems()))
             return HttpResponse(nodeString(typeName, name)+" created", status=201)
         else:
             return HttpResponse(nodeString(typeName, name)+" exists", status=200)
@@ -49,7 +50,7 @@ def addNode(request):
 # required POST data: 'typeName', 'name', 'propName', 'propValue' 
 @csrf_exempt          
 def addPropertyToNode(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeName', 'name', 'propName', 'propValue')
     if parseResult[0] == False:
         return parseResult[1]
     [typeName, name, propName, propValue] = parseResult
@@ -58,7 +59,7 @@ def addPropertyToNode(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [node] = viewsHelper.getNodes(request, [typeName, name])
+    [node] = viewsHelper.getNodes(False, differentiators, [typeName, name])
     if node != None:
         node[propName] = propValue
         node.push()
@@ -70,7 +71,7 @@ def addPropertyToNode(request):
 # POST data must contain 'toType', 'toName', 'fromType', 'fromName', 'relName'
 @csrf_exempt
 def addRelationshipBetweenNodes(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'toType', 'toName', 'fromType', 'fromName', 'relName')
     if parseResult[0] == False:
         return parseResult[1]
     [toType, toName, fromType, fromName, relName] = parseResult
@@ -81,7 +82,7 @@ def addRelationshipBetweenNodes(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [nodeFrom, nodeTo,  fromTypeNode, toTypeNode] = viewsHelper.getNodes(request, 
+    [nodeFrom, nodeTo,  fromTypeNode, toTypeNode] = viewsHelper.getNodes(True, differentiators, 
         [fromType, fromName], [toType, toName], ['TypeNode', fromType], ['TypeNode', toType])
     if nodeTo != None and nodeFrom != None:
         if fromTypeNode != None and toTypeNode != None:
@@ -115,12 +116,11 @@ def viewNode(request):
     typeName = request.GET.get('typeName')
     name = request.GET.get('name')
 
-
     checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
-    [node] = viewsHelper.getNodes(request, [typeName, name])
+    [node] = viewsHelper.getNodes(False, differentiators, [typeName, name])
     if node != None:
         return render(request, 'node.html', 
             {"nodeType": node.labels.pop(),
@@ -137,7 +137,7 @@ def viewNode(request):
 # Required POST data: 'typeName'
 @csrf_exempt
 def createTypeNode(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'typeName')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
     [typeName] = parseResult
@@ -146,7 +146,7 @@ def createTypeNode(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [typeNode] = viewsHelper.getNodes(request, ['TypeNode', typeName])
+    [typeNode] = viewsHelper.getNodes(False, differentiators, ['TypeNode', typeName])
     if typeNode == None:
         db.createTypeNode(typeName)
         return HttpResponse("Type Node "+typeName+" created", status=201)
@@ -156,7 +156,7 @@ def createTypeNode(request):
 # Required POST data: 'relName'
 @csrf_exempt
 def createRelationshipType(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'relName')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'relName')
     if parseResult[0] == False:
         return parseResult[1]
     [relName] = parseResult
@@ -165,8 +165,7 @@ def createRelationshipType(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [relType] = viewsHelper.getNodes(request, ['RelationshipType', relName])
-    print relName+str(relType)
+    [relType] = viewsHelper.getNodes(False, differentiators, ['RelationshipType', relName])
     if relType == None:
         db.createRelationshipType(relName)
         return HttpResponse("Relationship Type "+relName+" created", status=201)
@@ -176,7 +175,7 @@ def createRelationshipType(request):
 # Required POST data: 'typeFrom', 'relName', 'typeTo'
 @csrf_exempt
 def connectTypeNodes(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeFrom', 'relName', 'typeTo')
     if parseResult[0] == False:
         return parseResult[1]
     [typeFrom, relName, typeTo] = parseResult
@@ -185,7 +184,7 @@ def connectTypeNodes(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [typeFromNode, typeToNode, relType] = viewsHelper.getNodes(request, 
+    [typeFromNode, typeToNode, relType] = viewsHelper.getNodes(False, differentiators, 
         ['TypeNode', typeFrom], ['TypeNode', typeTo], ['RelationshipType', relName])
 
     if typeFromNode == None:
@@ -204,7 +203,7 @@ def connectTypeNodes(request):
 # Required POST data: 'typeName'
 @csrf_exempt
 def getRelationshipDict(request):
-    parseResult = viewsHelper.parsePostRequest(request, 'typeName')
+    [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeName')
     if parseResult[0] == False:
         return parseResult[1]
     typeName = parseResult[0]
@@ -213,7 +212,7 @@ def getRelationshipDict(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [typeNode] = viewsHelper.getNodes(request, ['TypeNode', typeName])
+    [typeNode] = viewsHelper.getNodes(False, differentiators, ['TypeNode', typeName])
     if typeNode == None:
         return HttpResponse("TypeNode "+typeName+" couldn't be found", status=404)
     else:
