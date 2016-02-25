@@ -115,21 +115,36 @@ def viewNode(request):
     typeName = request.GET.get('typeName')
     name = request.GET.get('name')
 
-
     checkNameResult = viewsHelper.checkNames(typeName)
     if checkNameResult != True:
         return checkNameResult
 
     [node] = viewsHelper.getNodes(request, [typeName, name])
     if node != None:
-        return render(request, 'node.html', 
-            {"nodeType": node.labels.pop(),
+        return render(request, 'node.html',
+            {
+            'node': node,
+            'props': node.properties,
+            "nodeType": list(node.labels)[0],
             "nodeName": node['name'], 
             "outgoingRels": db.getOutgoingRels(node), 
             "incomingRels": db.getIncomingRels(node)
             })
     else:
         return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
+
+def viewNodeType(request):
+    typeName = request.GET.get('typeName')
+    checkNameResult = viewsHelper.checkNames(typeName)
+    if checkNameResult != True:
+        return checkNameResult
+
+    nodes = db.getNodesByType(typeName)
+    if nodes != []:
+        return render(request, 'nodes.html',{'nodes': nodes, 'nodeType': typeName})
+    else:
+        return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
+
 
 
 # ----- META API ------

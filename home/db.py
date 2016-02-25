@@ -1,6 +1,6 @@
 from py2neo import *
 
-g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
+g = Graph('http://neo4j:django@gmmotto.ddns.net:7474/db/data/')
 
 
 # Wrapping py2neo to give a domain-specific interface for our application
@@ -117,7 +117,21 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
 def getNode(typeName, name):
     typeName = typeName.title()
     name = name.replace("'", "\\'")
-    result = g.cypher.execute("MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n")
+
+    match_string = "MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n LIMIT 100"
+
+    result = g.cypher.execute(match_string)
+    return returnCypherResult(result)
+
+def getNodesByType(typeName, *props):
+    typeName = typeName.title()
+
+    match_string = "MATCH (n:" + typeName
+    #for prop in props:
+    #    match_string += " {name:'" + name + "'}"
+    match_string += ") RETURN n LIMIT 100"
+
+    result = g.cypher.execute(match_string)
     return returnCypherResult(result)
 
 def getOutgoingRels(node):
