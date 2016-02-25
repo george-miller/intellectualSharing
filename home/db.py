@@ -2,6 +2,12 @@ from py2neo import *
 
 g = Graph('http://neo4j:django@gmmotto.ddns.net:7474/db/data/')
 
+class TemplateNode():
+    def __init__(self, node):
+        self.node = node
+        self.properties = node.properties
+        self.name = node['name']
+        self.label = list(node.labels)[0]
 
 # Wrapping py2neo to give a domain-specific interface for our application
 

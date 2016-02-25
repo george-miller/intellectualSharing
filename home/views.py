@@ -119,16 +119,14 @@ def viewNode(request):
     if checkNameResult != True:
         return checkNameResult
 
-    [node] = viewsHelper.getNodes(request, [typeName, name])
+    [nodetemp] = viewsHelper.getNodes(request, [typeName, name])
+    node = db.TemplateNode(nodetemp)
     if node != None:
         return render(request, 'node.html',
             {
             'node': node,
-            'props': node.properties,
-            "nodeType": list(node.labels)[0],
-            "nodeName": node['name'], 
-            "outgoingRels": db.getOutgoingRels(node), 
-            "incomingRels": db.getIncomingRels(node)
+            "outgoingRels": db.getOutgoingRels(nodetemp),
+            "incomingRels": db.getIncomingRels(nodetemp)
             })
     else:
         return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
