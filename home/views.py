@@ -22,8 +22,8 @@ def home(request):
 def addNode(request):
     [parseResult, differentiators] = viewsHelper.parsePostRequest(request, 'typeName', 'name')
     print parseResult
-    if parseResult[0] == False:
-        return parseResult[1]
+    if parseResult == False:
+        return differentiators
     (typeName, name) = parseResult
 
     checkNameResult = viewsHelper.checkNames(typeName)
