@@ -120,11 +120,15 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
             return True
     return False
 
-def getNode(typeName, name):
+def getNode(typeName, differentiators):
     typeName = typeName.title()
     name = name.replace("'", "\\'")
-
     match_string = "MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n LIMIT 100"
+
+    for diff in differentiators.keys():
+        match_string += " {"diff+":"+differentiators[diff]+", "
+
+    match_string = match_string[:len(match_string)-2] + "}) RETURN n"
 
     result = g.cypher.execute(match_string)
     return returnCypherResult(result)
