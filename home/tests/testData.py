@@ -23,7 +23,8 @@ def getRandomWord():
 
 # NON-META
 nodes = [
-	('actor', 'Daniel Craig'),
+	('actor', 'Daniel Craig', {'hair': 'blond'}),
+#	('actor', 'Daniel Craig', {'eyes': 'blue'}),
 	('role', 'Daniel Craig In Skyfall'),
 	('character', 'James Bond'),
 	('movie', 'Skyfall'),
@@ -57,7 +58,7 @@ badAddNodePostData = [
 ]
 
 rels = [
-	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall'),
+	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall', {'hair': 'blond'}),
 	('role', 'Daniel Craig In Skyfall', 'played', 'character', 'James Bond'),
 	('role', 'Daniel Craig In Skyfall', 'in_production_of', 'movie', 'Skyfall'),
 	('movie', 'Skyfall', 'has_genre', 'genre', 'action'),

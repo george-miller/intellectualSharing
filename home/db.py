@@ -1,6 +1,6 @@
 from py2neo import *
 
-g = Graph('http://neo4j:django@gmmotto.ddns.net:7474/db/data/')
+g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
 
 class TemplateNode():
     def __init__(self, node):

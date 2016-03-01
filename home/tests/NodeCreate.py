@@ -9,6 +9,10 @@ class NodeCreate(unittest.TestCase):
 
 	def sendAddNodeRequest(self, url, n, expected_code):
 		data = {'typeName': n[0], 'name': n[1]}
+		# If this node has properties, add them to the request
+		if len(n) == 3:
+			for key in n[2].keys():
+				data[key] = n[2][key]
 		response = requests.post(url, data)
 		self.assertEqual(response.status_code, expected_code)
 
@@ -40,6 +44,9 @@ class NodeCreate(unittest.TestCase):
 			'toType' : r[3],
 			'toName' : r[4]
 		}
+		if len(r) == 6:
+			for key in r[5].keys():
+				data[key] = r[5][key]
 		response = requests.post(url, data)
 		self.assertEqual(response.status_code, expected_code)
 

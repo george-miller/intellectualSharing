@@ -38,7 +38,7 @@ def runTests():
 		MetaCreate.MetaCreate(), 
 		MetaGet.MetaGet(), 
 		NodeCreate.NodeCreate(),
-		RequestRulesTest.RequestRulesTest()
+		#RequestRulesTest.RequestRulesTest()
 	))
 
 	result = unittest.TestResult()
