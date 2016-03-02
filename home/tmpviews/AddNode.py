@@ -1,27 +1,30 @@
 import ApiRequest
+from .. import db
+from django.http import HttpResponse, JsonResponse
 
 # POST data must contain 'typeName' and 'name'
-class AddNode(ApiRequest):
+class AddNode(ApiRequest.ApiRequest):
 	def __init__(self):
-		super.__init__(('typeName'), ('typeName'))
+		super(AddNode, self).__init__(['typeName'], ['name'], ['typeName'])
 
 	def post(self, request):
-		result = super.post(request)
+		result = super(AddNode, self).post(request)
 		if result != None:
 			return result
+		typeName = self.requiredKeys['typeName']
+		if typeName == 'TypeNode' or typeName == 'RelationshipType':
+			return HttpResponse("You cannot create meta nodes with this url, try /createTypeNode", status=400)
 
-		[typeNode, node] = viewsHelper.getNodes(
-			['TypeNode', self.requiredKeys['typeName']], 
-			[self.requiredKeys['typeName'], self.requiredKeys['name'], self.differentiators]
+		[typeNode, node] = self.getNodes(
+			['TypeNode', typeName], 
+			[typeName, self.properties]
 			)
 
-	    if typeNode == None:
-	        return HttpResponse("Type node not found with typeName " + typeName, status=404)
-	    else:
-	    	if type(node) == 'HttpResponse':
-	    		return node
-	        elif node == None:
-	            db.createNode(typeName, name)
-	            return HttpResponse(nodeString(typeName, name)+" created", status=201)
-	        else:
-	            return HttpResponse(nodeString(typeName, name)+" exists", status=200)
+		if typeNode == None:
+			return HttpResponse("Type node not found with typeName " + typeName, status=404)
+		else:
+			if node == None:
+				db.createNode(typeName, self.properties)
+				return HttpResponse(self.nodeString(typeName, self.properties)+" created", status=201)
+			else:
+				return HttpResponse(self.nodeString(typeName, self.properties)+" exists", status=200)

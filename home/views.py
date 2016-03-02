@@ -5,8 +5,8 @@ import db
 import viewsHelper
 import json
 
-def nodeString(typeName, name):
-    return "Node - " + typeName + " : " + name
+def nodeString(typeName, properties):
+    return "Node - " + typeName + " : " + properties
 
 def relString(relName, fromType, fromName, toType, toName):
     return "Relationship - " + relName + " from " + nodeString(fromType, fromName) + " to " + nodeString(toType, toName)

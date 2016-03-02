@@ -1,11 +1,13 @@
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse
 import json
+from .. import db
 
 class ApiRequest(View):
-	def __init__(self, postKeys, namesToCheck):
+	def __init__(self, postKeys, requiredProps, namesToCheck):
 		self.postKeys = postKeys
 		self.namesToCheck = namesToCheck
+		self.requiredProps = requiredProps
 
 	def get(self, request):
 		return HttpResponse("Only POST requests supported", status=400)
@@ -15,13 +17,16 @@ class ApiRequest(View):
 		if result != None:
 			return result
 
-		result = self.checkNames(self.namesToCheck)
+		itemsToCheck = []
+		for name in self.namesToCheck:
+			itemsToCheck.append(self.requiredKeys[name])
+		result = self.checkNames(itemsToCheck)
 		if result != None:
 			return result
 
 		return None
 
-	def getNodes(*nodes):
+	def getNodes(self, *nodes):
 		nodesToReturn = []
 		for node in nodes:
 			nodeResult = None
@@ -31,62 +36,49 @@ class ApiRequest(View):
 				nodeResult = db.getRelationshipType(node[1])
 			else:
 				nodeResult = db.getNode(node[0], node[1])
-			if type(nodeResult) == type([]):
-				nodesToReturn.append(multipleNodesFound(node[2], nodeResult))
-			else:
-				nodesToReturn.append(nodeResult)
+			nodesToReturn.append(nodeResult)
 		return nodesToReturn
-
-	def multipleNodesFound(differentiators, nodeList):
-		hitsPerNode = []
-		for i in range(len(nodeList)):
-			hitsPerNode.append(0)
-			for key in nodeList[i].properties.keys():
-				if key in differentiators:
-					if nodeList[i].properties[key] == differentiators[key]:
-						hitsPerNode[i] += 1
-
-		maxHit = max(hitsPerNode)
-		maxPositions = [i for i,j in enumerate(hitsPerNode) if j==maxHit] # generates list of positions of maxes
-		if len(maxPositions) == 1:
-			return nodeList[maxPositions[0]]
-		else:
-			nodesWithSameHits = []
-			for position in maxPositions:
-				nodesWithSameHits.append(nodeList[position])
-			return HttpResponse("Couldn't differentiate between nodes: " + str(nodesWithSameHits), status=409)
 
 	# Generate differentiators and requiredKeys from a post request
 	def parsePostRequest(self, request):
-		json = json.loads(request.body)
+		requestJson = json.loads(request.body)
 
-		self.differentiators = {}
-		if 'differentiators' in json.keys():
-			self.differentiators = json['differentiators']
+		self.properties = {}
+		if 'properties' in requestJson.keys():
+			self.properties = requestJson['properties']
+		for prop in self.requiredProps:
+			if prop not in self.properties:
+				return HttpResponse("You must specify these properties: " + str(self.requiredProps), status=400)
 
 		self.requiredKeys = {}
 		requiredKeysFound = 0
-		for key in json.keys():
+		for key in requestJson.keys():
 			key = str(key)
 			if key in self.postKeys:
-				self.requiredKeys[key] = json[key]
-				requiredKeysFound++
+				self.requiredKeys[key] = requestJson[key]
+				requiredKeysFound+=1
 		if len(self.postKeys) > requiredKeysFound:
 			return HttpResponse("You must specify these keys: " + str(self.postKeys), status=400)
 		return None
 
-	def checkNames(names):
+	def checkNames(self, names):
 		for name in names:
 			if not self.isValidTypeOrRelTypeName(name):
 				return HttpResponse(self.typeRuleMessage(name), status=400)
 		return None
 
-	def isValidTypeOrRelTypeName(typeName):
+	def isValidTypeOrRelTypeName(self, typeName):
 		letters = list(typeName)
 		for letter in letters:
 			if not letter.isalnum() and not letter == '_':
 				return False
 		return True
 
-	def typeRuleMessage(typeName):
+	def typeRuleMessage(self, typeName):
 		return "Invalid Type Name: "+typeName+".  Types must only contain letters, numbers, and underscores"
+
+	def nodeString(self, typeName, properties):
+	    return "Node - " + typeName + " : " + str(properties)
+
+	def relString(self, relName, fromType, fromName, toType, toName):
+	    return "Relationship - " + relName + " from " + nodeString(fromType, fromName) + " to " + nodeString(toType, toName)

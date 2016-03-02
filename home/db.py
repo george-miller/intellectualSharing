@@ -101,9 +101,11 @@ def getRelationshipDict(typeNode):
 
 # ----- NON META METHODS ------ 
 
-def createNode(typeName, name):
+def createNode(typeName, properties):
     typeName = typeName.title()
-    node = Node(typeName, name=name)
+    node = Node(typeName)
+    for prop in properties.keys():
+        node[prop] = properties[prop]
     g.create(node)
     return node
 
@@ -120,15 +122,18 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
             return True
     return False
 
-def getNode(typeName, differentiators):
+def getNode(typeName, properties):
     typeName = typeName.title()
-    name = name.replace("'", "\\'")
-    match_string = "MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n LIMIT 100"
+    match_string = "MATCH (n:" + typeName + " {"
 
-    for diff in differentiators.keys():
-        match_string += " {"diff+":"+differentiators[diff]+", "
+    for prop in properties.keys():
+        properties[prop] = properties[prop].replace("'", "\\'")
+        match_string += prop+":'"+properties[prop]+"', "
 
-    match_string = match_string[:len(match_string)-2] + "}) RETURN n"
+    if len(properties.keys()) > 0:
+        match_string = match_string[:len(match_string)-2] + "}) RETURN n"
+    else:
+        match_string += "}) RETURN n"
 
     result = g.cypher.execute(match_string)
     return returnCypherResult(result)

@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
+from tmpviews.AddNode import AddNode
 
 from django.contrib import admin
 admin.autodiscover()
@@ -9,7 +10,7 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     
     # NON META API
-    url(r'^addNode', views.addNode, name='addNode'),
+    url(r'^addNode', AddNode.as_view(), name='addNode'),
     url(r'^addRelationshipBetweenNodes', views.addRelationshipBetweenNodes, name="addRelationshipBetweenNodes"),
     url(r'^addPropertyToNode', views.addPropertyToNode, name='addPropertyToNode'),
 

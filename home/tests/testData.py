@@ -23,23 +23,23 @@ def getRandomWord():
 
 # NON-META
 nodes = [
-	('actor', 'Daniel Craig', {'hair': 'blond'}),
+	('actor', {'name':'Daniel Craig', 'hair': 'blond'}),
 #	('actor', 'Daniel Craig', {'eyes': 'blue'}),
-	('role', 'Daniel Craig In Skyfall'),
-	('character', 'James Bond'),
-	('movie', 'Skyfall'),
-	('genre', 'action'),
-	('award', 'Tony')
+	('role', {'name':'Daniel Craig In Skyfall'}),
+	('character', {'name':'James Bond'}),
+	('movie', {'name':'Skyfall'}),
+	('genre', {'name':'action'}),
+	('award', {'name':'Tony'})
 ]
 badRequestNodes = [
-	('$$', 'Moneyyy'),
-	('TypeNode', 'Actor'),
-	('acto r', '____')
+	('$$', {'name':'Moneyyy'}),
+	('TypeNode', {'name':'Actor'}),
+	('acto r', {'name':'___'})
 ]
 notFoundNodes = [
-	('poop', 'poop'),
-	('acttor', '*)*#'),
-	('actorr', 'Baddie')
+	('poop', {'name':'poop'}),
+	('acttor', {'name':'*)*#'}),
+	('actorr', {'name':'Baddie'})
 ]
 
 badAddNodePostData = [
