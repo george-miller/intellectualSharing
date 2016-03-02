@@ -4,10 +4,14 @@ import json
 from .. import db
 
 class ApiRequest(View):
-	def __init__(self, postKeys, requiredProps, namesToCheck):
-		self.postKeys = postKeys
-		self.namesToCheck = namesToCheck
-		self.requiredProps = requiredProps
+	def __init__(self, sampleRequest):
+		self.sampleRequest = sampleRequest
+		self.namesToCheck = []
+
+		for key in sampleRequest.keys():
+			if sampleRequest[key] == 'checkName':
+				self.namesToCheck.append(key)
+
 
 	def get(self, request):
 		return HttpResponse("Only POST requests supported", status=400)
@@ -19,7 +23,7 @@ class ApiRequest(View):
 
 		itemsToCheck = []
 		for name in self.namesToCheck:
-			itemsToCheck.append(self.requiredKeys[name])
+			itemsToCheck.append(self.requestJson[name])
 		result = self.checkNames(itemsToCheck)
 		if result != None:
 			return result
@@ -41,24 +45,16 @@ class ApiRequest(View):
 
 	# Generate differentiators and requiredKeys from a post request
 	def parsePostRequest(self, request):
-		requestJson = json.loads(request.body)
+		self.requestJson = json.loads(request.body)
 
-		self.properties = {}
-		if 'properties' in requestJson.keys():
-			self.properties = requestJson['properties']
-		for prop in self.requiredProps:
-			if prop not in self.properties:
-				return HttpResponse("You must specify these properties: " + str(self.requiredProps), status=400)
-
-		self.requiredKeys = {}
-		requiredKeysFound = 0
-		for key in requestJson.keys():
-			key = str(key)
-			if key in self.postKeys:
-				self.requiredKeys[key] = requestJson[key]
-				requiredKeysFound+=1
-		if len(self.postKeys) > requiredKeysFound:
-			return HttpResponse("You must specify these keys: " + str(self.postKeys), status=400)
+		for key in self.sampleRequest:
+			if key not in self.requestJson:
+				return HttpResponse("You must specify these keys: " + str(self.sampleRequest.keys()), status=400)
+			if isinstance(self.sampleRequest[key], dict):
+				for innerKey in self.sampleRequest[key]:
+					if innerKey not in self.requestJson[key]:
+						return HttpResponse("You must specify these inner keys: " + str(self.sampleRequest[key]) + " for this key: "+key, status=400)
+		
 		return None
 
 	def checkNames(self, names):
@@ -80,5 +76,5 @@ class ApiRequest(View):
 	def nodeString(self, typeName, properties):
 	    return "Node - " + typeName + " : " + str(properties)
 
-	def relString(self, relName, fromType, fromName, toType, toName):
-	    return "Relationship - " + relName + " from " + nodeString(fromType, fromName) + " to " + nodeString(toType, toName)
+	def relString(self, relName, fromType, fromProps, toType, toProps):
+	    return "Relationship - " + relName + " from " + nodeString(fromType, fromProps) + " to " + nodeString(toType, toProps)
