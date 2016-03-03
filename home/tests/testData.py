@@ -76,6 +76,51 @@ movieRelationshipDict = {
 	}
 }
 
-multipleNodesRequestDict = {
-	u'typeName': u'Movie'
-}
+goodAddPropertyToNode = [
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	},
+	{
+		'typeName' : 'role',
+		'properties' : {'name': 'Daniel Craig In Skyfall'},
+		'newProperties' : {'rating' : '4.0'}
+	},
+	{
+		'typeName' : 'movie',
+		'properties' : {'name':'Skyfall'},
+		'newProperties' : {'rating' : '4.1'}
+	},
+	{
+		'typeName' : 'award',
+		'properties' : {'name':'Tony'},
+		'newProperties' : {'material' : 'gold'}
+	}
+]
+badAddPropertyToNode = [
+	{
+		'typeName' : '$%^',
+		'newProperties' : {'rating' : '4.0'}
+	},
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'}
+	},
+	{
+		'properties' : {'name': 'Daniel Craig In Skyfall'},
+		'newProperties' : {'rating' : '4.0'}
+	}
+]
+notFoundAddPropertyToNode = [
+	{
+		'typeName' : 'vdfeq',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	},
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Dandiel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	}
+]

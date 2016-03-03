@@ -1,28 +1,40 @@
 import ApiRequest
+from django.http import HttpResponse, JsonResponse
+
 
 # POST data must contain 'typeName' and 'name'
-class AddPropToNode(ApiRequest):
+class AddPropToNode(ApiRequest.ApiRequest):
 	def __init__(self):
-		super.__init__('typeName', 'name')
+		super(AddPropToNode, self).__init__(
+			{
+				'typeName' : 'checkName',
+				'properties' : ['name'],
+				'newProperties' : 'dontCheck'
+			}
+		)
 
 	def post(self, request):
-		result = self.parsePostRequest(request)
+		result = super(AddPropToNode, self).post(request)
 		if result != None:
 			return result
 
-		result = self.checkNames(self.requiredKeys['typeName'])
-		if result != None:
-			return result
+		typeName = self.requestJson['typeName']
+		properties = self.requestJson['properties']
 
-		[typeNode, node] = viewsHelper.getNodes(request, 
-			['TypeNode', self.requiredKeys['typeName']], 
-			[self.requiredKeys['typeName'], self.requiredKeys['name']])
+		[typeNode, node] = self.getNodes(
+			['TypeNode', typeName], 
+			[typeName, properties]
+			)
 
-	    if typeNode == None:
-	        return HttpResponse("Type node not found with typeName " + typeName, status=404)
-	    else:
-	        if node == None:
-	            db.createNode(typeName, name)
-	            return HttpResponse(nodeString(typeName, name)+" created", status=201)
-	        else:
-	            return HttpResponse(nodeString(typeName, name)+" exists", status=200)
+		if typeNode == None:
+			return HttpResponse("Type node not found with typeName " + typeName, status=404)
+		else:
+			if node == None:
+				return HttpResponse(self.nodeString(typeName, properties)+" not found", status=404)
+			else:
+				newProperties = self.requestJson['newProperties']
+				for key in newProperties.keys():
+					node[key] = newProperties[key]
+				node.push()
+				return HttpResponse("Added Properties: " + str(newProperties) + 
+					" to " +self.nodeString(typeName, properties), status=201)

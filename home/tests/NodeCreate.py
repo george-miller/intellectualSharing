@@ -7,6 +7,7 @@ class NodeCreate(unittest.TestCase):
 	def runTest(self):
 		self.TestAddNode()
 		self.TestAddRelationshipBetweenNodes()
+		self.TestAddPropertyToNodes()
 
 	def sendAddNodeRequest(self, url, n, expected_code):
 		data = {'typeName': n[0], 'properties': n[1]}
@@ -54,3 +55,16 @@ class NodeCreate(unittest.TestCase):
 		for r in testData.rels:
 			self.sendAddRelRequest(url, r, 201)
 			self.sendAddRelRequest(url, r, 200)
+
+	def TestAddPropertyToNodes(self):
+		url = testData.baseurl + 'addPropertyToNode'
+		self.assertEqual(requests.get(url).status_code, 400)
+		for req in testData.goodAddPropertyToNode:
+			self.sendAddPropRequest(req, url , 201)
+		for req in testData.badAddPropertyToNode:
+			self.sendAddPropRequest(req, url, 400)
+
+	def sendAddPropRequest(self, req, url, expected_code):
+		data = json.dumps(req)
+		response = requests.post(url, data)
+		self.assertEqual(response.status_code, expected_code)

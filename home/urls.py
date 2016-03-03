@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
-from tmpviews import AddNode, ConnectNodes
+from tmpviews import AddNode, ConnectNodes, AddPropToNode
 
 from django.contrib import admin
 admin.autodiscover()
@@ -12,7 +12,7 @@ urlpatterns = [
     # NON META API
     url(r'^addNode', AddNode.AddNode.as_view(), name='addNode'),
     url(r'^addRelationshipBetweenNodes', ConnectNodes.ConnectNodes.as_view(), name="addRelationshipBetweenNodes"),
-    url(r'^addPropertyToNode', views.addPropertyToNode, name='addPropertyToNode'),
+    url(r'^addPropertyToNode', AddPropToNode.AddPropToNode.as_view(), name='addPropertyToNode'),
 
     #Node Lookup URL with label and id variables
     url(r'^viewNode$', views.viewNode, name='viewNode'),

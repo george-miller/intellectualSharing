@@ -6,7 +6,7 @@ from py2neo import *
 import unittest
 import requests
 from .. import db
-from . import testData, MetaCreate, MetaGet, NodeCreate, RequestRulesTest
+from . import testData, MetaCreate, MetaGet, NodeCreate
 from colorama import init
 from colorama import Fore, Back, Style
 init()
@@ -38,7 +38,6 @@ def runTests():
 		MetaCreate.MetaCreate(), 
 		MetaGet.MetaGet(), 
 		NodeCreate.NodeCreate(),
-		#RequestRulesTest.RequestRulesTest()
 	))
 
 	result = unittest.TestResult()
