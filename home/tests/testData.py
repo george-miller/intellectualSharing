@@ -24,7 +24,7 @@ def getRandomWord():
 # NON-META
 nodes = [
 	('actor', {'name':'Daniel Craig', 'hair': 'blond'}),
-#	('actor', 'Daniel Craig', {'eyes': 'blue'}),
+	('actor', {'name':'Daniel Craig', 'eyes': 'blue'}),
 	('role', {'name':'Daniel Craig In Skyfall'}),
 	('character', {'name':'James Bond'}),
 	('movie', {'name':'Skyfall'}),
@@ -58,11 +58,11 @@ badAddNodePostData = [
 ]
 
 rels = [
-	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall', {'hair': 'blond'}),
-	('role', 'Daniel Craig In Skyfall', 'played', 'character', 'James Bond'),
-	('role', 'Daniel Craig In Skyfall', 'in_production_of', 'movie', 'Skyfall'),
-	('movie', 'Skyfall', 'has_genre', 'genre', 'action'),
-	('movie', 'Skyfall', 'awarded', 'award', 'Tony')
+	('actor', {'name':'Daniel Craig', 'hair': 'blond'}, 'had_role', 'role', {'name': 'Daniel Craig In Skyfall'}),
+	('role', {'name': 'Daniel Craig In Skyfall'}, 'played', 'character', {'name':'James Bond'}),
+	('role', {'name': 'Daniel Craig In Skyfall'}, 'in_production_of', 'movie', {'name':'Skyfall'}),
+	('movie', {'name':'Skyfall'}, 'has_genre', 'genre', {'name':'action'}),
+	('movie', {'name':'Skyfall'}, 'awarded', 'award', {'name':'Tony'})
 ]
 
 movieRelationshipDict = {

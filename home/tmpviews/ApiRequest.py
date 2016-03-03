@@ -77,4 +77,4 @@ class ApiRequest(View):
 	    return "Node - " + typeName + " : " + str(properties)
 
 	def relString(self, relName, fromType, fromProps, toType, toProps):
-	    return "Relationship - " + relName + " from " + nodeString(fromType, fromProps) + " to " + nodeString(toType, toProps)
+	    return "Relationship - " + relName + " from " + self.nodeString(fromType, fromProps) + " to " + self.nodeString(toType, toProps)

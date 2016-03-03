@@ -6,7 +6,7 @@ import requests
 class NodeCreate(unittest.TestCase):
 	def runTest(self):
 		self.TestAddNode()
-		#self.TestAddRelationshipBetweenNodes()
+		self.TestAddRelationshipBetweenNodes()
 
 	def sendAddNodeRequest(self, url, n, expected_code):
 		data = {'typeName': n[0], 'properties': n[1]}
@@ -38,15 +38,13 @@ class NodeCreate(unittest.TestCase):
 	def sendAddRelRequest(self, url, r, expected_code):
 		data = {
 			'fromType': r[0],
-			'fromName' : r[1],
+			'fromProperties' : r[1],
 			'relName' : r[2],
 			'toType' : r[3],
-			'toName' : r[4]
+			'toProperties' : r[4]
 		}
-		if len(r) == 6:
-			for key in r[5].keys():
-				data[key] = r[5][key]
-		response = requests.post(url, data)
+		d = json.dumps(data)
+		response = requests.post(url, d)
 		self.assertEqual(response.status_code, expected_code)
 
 			
