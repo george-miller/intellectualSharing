@@ -131,9 +131,9 @@ def getNode(typeName, properties):
         match_string += prop+":'"+properties[prop]+"', "
 
     if len(properties.keys()) > 0:
-        match_string = match_string[:len(match_string)-2] + "}) RETURN n"
+        match_string = match_string[:len(match_string)-2] + "}) RETURN n LIMIT 100"
     else:
-        match_string += "}) RETURN n"
+        match_string += "}) RETURN n LIMIT 100"
 
     result = g.cypher.execute(match_string)
     return returnCypherResult(result)
@@ -150,8 +150,8 @@ def getNodesByType(typeName, *props):
     return returnCypherResult(result)
 
 def getOutgoingRels(node):
-    if 'TypeNode' in node.labels:
-        print "This method does not work for TypeNodes"
+    if 'TypeNode' in node.labels or 'RelationshipType' in node.labels:
+        print "This method does not work for TypeNodes or RelationshipTypes"
         return None
     else:
         rels = []
@@ -160,8 +160,8 @@ def getOutgoingRels(node):
         return rels
 
 def getIncomingRels(node):
-    if 'TypeNode' in node.labels:
-        print "This method does not work for TypeNodes"
+    if 'TypeNode' in node.labels or 'RelationshipType' in node.labels:
+        print "This method does not work for TypeNodes or RelationshipTypes"
         return None
     else:
         rels = []

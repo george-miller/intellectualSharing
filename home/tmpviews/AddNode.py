@@ -1,6 +1,6 @@
 import ApiRequest
 from .. import db
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
 # POST data must contain 'typeName' and 'name'
 class AddNode(ApiRequest.ApiRequest):

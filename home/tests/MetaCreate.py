@@ -1,6 +1,6 @@
 import testData
 import unittest
-import requests
+import requests, json
 
 class MetaCreate(unittest.TestCase):
 	def runTest(self):
@@ -13,14 +13,17 @@ class MetaCreate(unittest.TestCase):
 		self.assertEqual(requests.get(url).status_code, 400)
 		for t in testData.types:
 			data = {'typeName' : t}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
 		for t in testData.types:
 			data = {'typeName' : t}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 200)
 		for t in testData.badTypes:
 			data = {'typeName' : t}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 400)
 
@@ -29,10 +32,12 @@ class MetaCreate(unittest.TestCase):
 		self.assertEqual(requests.get(url).status_code, 400)
 		for r in testData.relTypes:
 			data = {'relName' : r}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
 		for r in testData.relTypes:
 			data = {'relName' : r}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 200)
 
@@ -45,6 +50,7 @@ class MetaCreate(unittest.TestCase):
 				'relName' : connection[1],
 				'typeTo' : connection[2]
 			}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 201)
 		for connection in testData.connections:
@@ -53,5 +59,6 @@ class MetaCreate(unittest.TestCase):
 				'relName' : connection[1],
 				'typeTo' : connection[2]
 			}
+			data = json.dumps(data)
 			response = requests.post(url, data)
 			self.assertEqual(response.status_code, 200)

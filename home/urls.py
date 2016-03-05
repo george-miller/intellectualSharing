@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
-from tmpviews import AddNode, ConnectNodes, AddPropToNode
+from tmpviews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode
 
 from django.contrib import admin
 admin.autodiscover()
@@ -15,13 +15,13 @@ urlpatterns = [
     url(r'^addPropertyToNode', AddPropToNode.AddPropToNode.as_view(), name='addPropertyToNode'),
 
     #Node Lookup URL with label and id variables
-    url(r'^viewNode$', views.viewNode, name='viewNode'),
+    url(r'^viewNode$', ViewNode.ViewNode.as_view(), name='viewNode'),
     url(r'^viewNodeType$', views.viewNodeType, name='viewNodeType'),
 
     # META API
     url(r'^typeNodeEditor', views.typeNodeEditor, name='typeNodeEditor'),
-    url(r'^createTypeNode', views.createTypeNode, name='createTypeNode'),
-    url(r'^createRelationshipType', views.createRelationshipType, name='createRelationshipType'),
-    url(r'^connectTypeNodes', views.connectTypeNodes, name='connectTypeNodes'),
-    url(r'^getRelationshipDict', views.getRelationshipDict, name='getRelationshipDict'),
+    url(r'^createTypeNode', CreateTypeNode.CreateTypeNode.as_view(), name='createTypeNode'),
+    url(r'^createRelationshipType', CreateRelationshipType.CreateRelationshipType.as_view(), name='createRelationshipType'),
+    url(r'^connectTypeNodes', ConnectTypeNodes.ConnectTypeNodes.as_view(), name='connectTypeNodes'),
+    url(r'^getRelationshipDict', GetRelationshipDict.GetRelationshipDict.as_view(), name='getRelationshipDict'),
 ]
