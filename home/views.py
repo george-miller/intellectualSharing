@@ -16,26 +16,6 @@ def home(request):
 
 # ------ NON-META API ------
 
-def viewNode(request):
-    typeName = request.GET.get('typeName')
-    name = request.GET.get('name')
-
-    checkNameResult = viewsHelper.checkNames(typeName)
-    if checkNameResult != True:
-        return checkNameResult
-
-    [nodetemp] = viewsHelper.getNodes(request, [typeName, name])
-    node = db.TemplateNode(nodetemp)
-    if node != None:
-        return render(request, 'node.html',
-            {
-            'node': node,
-            "outgoingRels": db.getOutgoingRels(nodetemp),
-            "incomingRels": db.getIncomingRels(nodetemp)
-            })
-    else:
-        return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
-
 def viewNodeType(request):
     typeName = request.GET.get('typeName')
     checkNameResult = viewsHelper.checkNames(typeName)

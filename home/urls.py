@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
-from tmpviews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode
-
+from tmpviews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode, ViewTypeNode
 from django.contrib import admin
 admin.autodiscover()
 
@@ -16,7 +15,7 @@ urlpatterns = [
 
     #Node Lookup URL with label and id variables
     url(r'^viewNode$', ViewNode.ViewNode.as_view(), name='viewNode'),
-    url(r'^viewNodeType$', views.viewNodeType, name='viewNodeType'),
+    url(r'^viewTypeNode$', ViewTypeNode.ViewTypeNode.as_view(), name='viewNodeType'),
 
     # META API
     url(r'^typeNodeEditor', views.typeNodeEditor, name='typeNodeEditor'),

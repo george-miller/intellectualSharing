@@ -46,7 +46,7 @@
         <h4>Outgoing Relationships</h4>
         {% for i in outgoingRels|get_len|get_range %}
         -&gt;  {{outgoingRels|lookup:i|lookup:0}}
-        -&gt; <a href="viewNodeType?typeName={{outgoingRels|lookup:i|lookup:1}}">{{outgoingRels|lookup:i|lookup:1}}</a>
+        -&gt; <a href="viewTypeNode?typeName={{outgoingRels|lookup:i|lookup:1}}">{{outgoingRels|lookup:i|lookup:1}}</a>
         : <a href="viewNode?typeName={{outgoingRels|lookup:i|lookup:1}}&name={{outgoingRels|lookup:i|lookup:2}}">{{outgoingRels|lookup:i|lookup:2}}</a>
         <br/>
         {% endfor %}
@@ -55,7 +55,7 @@
     <div class="col-xs-12 section">
         <h4>Incoming Relationships</h4>
         {% for i in incomingRels|get_len|get_range %}
-        <a href="viewNodeType?typeName={{incomingRels|lookup:i|lookup:1}}">{{incomingRels|lookup:i|lookup:1}}</a>
+        <a href="viewTypeNode?typeName={{incomingRels|lookup:i|lookup:1}}">{{incomingRels|lookup:i|lookup:1}}</a>
         : <a href="viewNode?typeName={{incomingRels|lookup:i|lookup:1}}&name={{incomingRels|lookup:i|lookup:2}}">{{incomingRels|lookup:i|lookup:2}}</a>
         -&gt; {{incomingRels|lookup:i|lookup:0}}
         -&gt;
