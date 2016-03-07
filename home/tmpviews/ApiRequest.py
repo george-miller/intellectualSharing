@@ -1,8 +1,11 @@
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
+from django.utils.decorators import method_decorator
 from .. import db
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ApiRequest(View):
 	def __init__(self, sampleRequest):
 		self.sampleRequest = sampleRequest

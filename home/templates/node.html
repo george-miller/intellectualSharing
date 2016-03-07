@@ -1,5 +1,4 @@
 {% extends "skeleton.html" %}
-{% load home_extras %}
 
 {% block style %}
 <style type="text/css" media="screen">
@@ -31,14 +30,14 @@
     <div class="col-xs-12 section">
         <h4>Properties</h4>
         {% for key in node.properties %}
-            {{key}}: {{node.properties|hash:key}}<br>
+            {{key}}: {{node.properties}}<br>
         {% endfor %}
     </div>
 
     {% if 'Images' in node.properties %}
     <div class="col-xs-12 section">
         <h4>Images</h4>
-        <div class="col-xs-4"><img src="{{node.properties|hash:'Images'}}" /></div>
+        <div class="col-xs-4"><img src="{{node.properties}}" /></div>
     </div>
     {% endif %}
 

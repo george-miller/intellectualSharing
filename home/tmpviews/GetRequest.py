@@ -49,7 +49,6 @@ class GetRequest(View):
 		for key in request.GET.keys():
 			self.request[key] = request.GET.get(key)
 
-		print self.request
 		for key in self.sampleRequest:
 			if key not in self.request:
 				return HttpResponse("You must specify these keys: " + str(self.sampleRequest.keys()), status=400)

@@ -3,6 +3,11 @@ import random
 
 baseurl = "http://localhost:8000/"
 
+words = requests.get("http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").content.splitlines()
+def getRandomWord():
+	return words[random.randint(0, len(words))]
+
+
 # META
 types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
 badTypes = ['A C T', 'GG****', '[]', '|\|', ',..,']
@@ -15,10 +20,6 @@ connections = [
 	('actor', 'awarded', 'award'),
 	('movie', 'awarded', 'award')
 ]
-
-words = requests.get("http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").content.splitlines()
-def getRandomWord():
-	return words[random.randint(0, len(words))]
 
 
 # NON-META
