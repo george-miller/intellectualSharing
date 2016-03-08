@@ -54,6 +54,8 @@ class ApiRequest(View):
 			if key not in self.requestJson:
 				return HttpResponse("You must specify these keys: " + str(self.sampleRequest.keys()), status=400)
 			if isinstance(self.sampleRequest[key], dict):
+				if not isinstance(self.requestJson[key], dict):
+					return HttpResponse("Invalid request: " + key + " must be a dict, in your request it was of type: " + type(self.requestJson[key]), status=400)
 				for innerKey in self.sampleRequest[key]:
 					if innerKey not in self.requestJson[key]:
 						return HttpResponse("You must specify these inner keys: " + str(self.sampleRequest[key]) + " for this key: "+key, status=400)
