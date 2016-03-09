@@ -1,4 +1,5 @@
 from py2neo import *
+import json
 
 g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
 
@@ -105,7 +106,10 @@ def createNode(typeName, properties):
     typeName = typeName.title()
     node = Node(typeName)
     for prop in properties.keys():
-        node[prop] = properties[prop]
+        if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
+            node[prop] = json.dumps(properties[prop])
+        else: 
+            node[prop] = properties[prop]
     g.create(node)
     return node
 
@@ -127,8 +131,11 @@ def getNode(typeName, properties):
     match_string = "MATCH (n:" + typeName + " {"
 
     for prop in properties.keys():
-        properties[prop] = properties[prop].replace("'", "\\'")
-        match_string += prop+":'"+properties[prop]+"', "
+        if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
+            match_string += prop+":'"+json.dumps(properties[prop])+"', "
+        else:
+            properties[prop] = properties[prop].replace("'", "\\'")
+            match_string += prop+":'"+properties[prop]+"', "
 
     if len(properties.keys()) > 0:
         match_string = match_string[:len(match_string)-2] + "}) RETURN n LIMIT 100"

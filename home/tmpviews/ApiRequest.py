@@ -46,7 +46,6 @@ class ApiRequest(View):
 			nodesToReturn.append(nodeResult)
 		return nodesToReturn
 
-	# Generate differentiators and requiredKeys from a post request
 	def parsePostRequest(self, request):
 		self.requestJson = json.loads(request.body)
 

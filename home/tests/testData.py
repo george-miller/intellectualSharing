@@ -24,11 +24,14 @@ connections = [
 
 # NON-META
 nodes = [
-	('actor', {'name':'Daniel Craig', 'hair': 'blond'}),
+	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}),
+	('actor', {'name':'Daniel Craig', 'hair': 'blond', 'likes': ['sex', 'blood', '$$$']}),
 	('actor', {'name':'Daniel Craig', 'eyes': 'blue'}),
 	('role', {'name':'Daniel Craig In Skyfall'}),
+	('role', {'name':'Liam Neeson in Taken'}),
 	('character', {'name':'James Bond'}),
 	('movie', {'name':'Skyfall'}),
+	('movie', {'name':'Taken', 'ratings': '0.0'}),
 	('genre', {'name':'action'}),
 	('award', {'name':'Tony'})
 ]
@@ -63,7 +66,9 @@ rels = [
 	('role', {'name': 'Daniel Craig In Skyfall'}, 'played', 'character', {'name':'James Bond'}),
 	('role', {'name': 'Daniel Craig In Skyfall'}, 'in_production_of', 'movie', {'name':'Skyfall'}),
 	('movie', {'name':'Skyfall'}, 'has_genre', 'genre', {'name':'action'}),
-	('movie', {'name':'Skyfall'}, 'awarded', 'award', {'name':'Tony'})
+	('movie', {'name':'Skyfall'}, 'awarded', 'award', {'name':'Tony'}),
+	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}, 'had_role', 'role', {'name': 'Liam Neeson in Taken'}),
+	('role', {'name': 'Liam Neeson in Taken'}, 'in_production_of', 'movie', {'name':'Taken'}),
 ]
 
 movieRelationshipDict = {
