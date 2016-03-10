@@ -107,8 +107,12 @@ def createNode(typeName, properties):
     node = Node(typeName)
     for prop in properties.keys():
         if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
-            node[prop] = json.dumps(properties[prop])
+            data = json.dumps(properties[prop])
+            data = data.replace("'", "\\'")
+            data = data.replace('"', '\\"')
+            node[prop] = data
         else: 
+            properties[prop] = properties[prop].replace("'", "\\'")
             node[prop] = properties[prop]
     g.create(node)
     return node
@@ -132,7 +136,10 @@ def getNode(typeName, properties):
 
     for prop in properties.keys():
         if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
-            match_string += prop+":'"+json.dumps(properties[prop])+"', "
+            data = json.dumps(properties[prop])
+            data = data.replace("'", "\\\\\\'")
+            data = data.replace('"', '\\\\\\"')
+            match_string += prop+":'"+data+"', "
         else:
             properties[prop] = properties[prop].replace("'", "\\'")
             match_string += prop+":'"+properties[prop]+"', "
