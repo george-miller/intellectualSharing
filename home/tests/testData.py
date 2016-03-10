@@ -25,6 +25,7 @@ connections = [
 # NON-META
 nodes = [
 	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}),
+	('actor', {'name':'Liam Neeson', 'description': ['Well Liam, you are descriptive', 'Yes you are'], 'dict': {'day':'lovely'}, 'list' : [1, 2, 3, 4, 5]}),
 	('actor', {'name':'Daniel Craig', 'hair': 'blond', 'likes': ['sex', 'blood', '$$$']}),
 	('actor', {'name':'Daniel Craig', 'eyes': 'blue'}),
 	('role', {'name':'Daniel Craig In Skyfall'}),
