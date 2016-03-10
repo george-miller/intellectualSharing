@@ -36,6 +36,8 @@ nodes = [
 	('award', {'name':'Tony'})
 ]
 badRequestNodes = [
+	('actor', 'properties'),
+	('actor', ['1', '2']),
 	('$$', {'name':'Moneyyy'}),
 	('TypeNode', {'name':'Actor'}),
 	('acto r', {'name':'___'})
