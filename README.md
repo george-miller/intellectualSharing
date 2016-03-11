@@ -12,4 +12,4 @@ Install neo4j from their website and start neo4j with:
 
 Running Tests:
 Be careful! This will delete your db!
-```python test.py```
+```python manage.py test```

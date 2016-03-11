@@ -3,6 +3,11 @@ import random
 
 baseurl = "http://localhost:8000/"
 
+words = requests.get("http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").content.splitlines()
+def getRandomWord():
+	return words[random.randint(0, len(words))]
+
+
 # META
 types = ['actor', 'role', 'movie', 'genre', 'character', 'award']
 badTypes = ['A C T', 'GG****', '[]', '|\|', ',..,']
@@ -16,29 +21,32 @@ connections = [
 	('movie', 'awarded', 'award')
 ]
 
-words = requests.get("http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").content.splitlines()
-def getRandomWord():
-	return words[random.randint(0, len(words))]
-
 
 # NON-META
 nodes = [
-	('actor', 'Daniel Craig'),
-	('role', 'Daniel Craig In Skyfall'),
-	('character', 'James Bond'),
-	('movie', 'Skyfall'),
-	('genre', 'action'),
-	('award', 'Tony')
+	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}),
+	('actor', {'name':'Liam Neeson', 'description': ["Well Liam, you're de\"scriptive", 'Yes you are'], 'dict': {'day':'lovely'}, 'list' : [1, 2, 3, 4, 5]}),
+	('actor', {'name':'Daniel Craig', 'hair': 'blond', 'likes': ['sex', 'blood', '$$$']}),
+	('actor', {'name':'Daniel Craig', 'eyes': 'blue'}),
+	('role', {'name':'Daniel Craig In Skyfall'}),
+	('role', {'name':'Liam Neeson in Taken'}),
+	('character', {'name':'James Bond'}),
+	('movie', {'name':'Skyfall'}),
+	('movie', {'name':'Taken', 'ratings': '0.0'}),
+	('genre', {'name':'action'}),
+	('award', {'name':'Tony'})
 ]
 badRequestNodes = [
-	('$$', 'Moneyyy'),
-	('TypeNode', 'Actor'),
-	('acto r', '____')
+	('actor', 'properties'),
+	('actor', ['1', '2']),
+	('$$', {'name':'Moneyyy'}),
+	('TypeNode', {'name':'Actor'}),
+	('acto r', {'name':'___'})
 ]
 notFoundNodes = [
-	('poop', 'poop'),
-	('acttor', '*)*#'),
-	('actorr', 'Baddie')
+	('poop', {'name':'poop'}),
+	('acttor', {'name':'*)*#'}),
+	('actorr', {'name':'Baddie'})
 ]
 
 badAddNodePostData = [
@@ -57,11 +65,13 @@ badAddNodePostData = [
 ]
 
 rels = [
-	('actor', 'Daniel Craig', 'had_role', 'role', 'Daniel Craig In Skyfall'),
-	('role', 'Daniel Craig In Skyfall', 'played', 'character', 'James Bond'),
-	('role', 'Daniel Craig In Skyfall', 'in_production_of', 'movie', 'Skyfall'),
-	('movie', 'Skyfall', 'has_genre', 'genre', 'action'),
-	('movie', 'Skyfall', 'awarded', 'award', 'Tony')
+	('actor', {'name':'Daniel Craig', 'hair': 'blond'}, 'had_role', 'role', {'name': 'Daniel Craig In Skyfall'}),
+	('role', {'name': 'Daniel Craig In Skyfall'}, 'played', 'character', {'name':'James Bond'}),
+	('role', {'name': 'Daniel Craig In Skyfall'}, 'in_production_of', 'movie', {'name':'Skyfall'}),
+	('movie', {'name':'Skyfall'}, 'has_genre', 'genre', {'name':'action'}),
+	('movie', {'name':'Skyfall'}, 'awarded', 'award', {'name':'Tony'}),
+	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}, 'had_role', 'role', {'name': 'Liam Neeson in Taken'}),
+	('role', {'name': 'Liam Neeson in Taken'}, 'in_production_of', 'movie', {'name':'Taken'}),
 ]
 
 movieRelationshipDict = {
@@ -75,6 +85,51 @@ movieRelationshipDict = {
 	}
 }
 
-multipleNodesRequestDict = {
-	u'typeName': u'Movie'
-}
+goodAddPropertyToNode = [
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	},
+	{
+		'typeName' : 'role',
+		'properties' : {'name': 'Daniel Craig In Skyfall'},
+		'newProperties' : {'rating' : '4.0'}
+	},
+	{
+		'typeName' : 'movie',
+		'properties' : {'name':'Skyfall'},
+		'newProperties' : {'rating' : '4.1'}
+	},
+	{
+		'typeName' : 'award',
+		'properties' : {'name':'Tony'},
+		'newProperties' : {'material' : 'gold'}
+	}
+]
+badAddPropertyToNode = [
+	{
+		'typeName' : '$%^',
+		'newProperties' : {'rating' : '4.0'}
+	},
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'}
+	},
+	{
+		'properties' : {'name': 'Daniel Craig In Skyfall'},
+		'newProperties' : {'rating' : '4.0'}
+	}
+]
+notFoundAddPropertyToNode = [
+	{
+		'typeName' : 'vdfeq',
+		'properties' : {'name':'Daniel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	},
+	{
+		'typeName' : 'actor',
+		'properties' : {'name':'Dandiel Craig', 'hair': 'blond'},
+		'newProperties' : {'eyes' : 'striking'}
+	}
+]

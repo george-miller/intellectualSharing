@@ -1,6 +1,7 @@
 from py2neo import *
+import json
 
-g = Graph('http://neo4j:django@gmmotto.ddns.net:7474/db/data/')
+g = Graph('http://neo4j:django@127.0.0.1:7474/db/data/')
 
 class TemplateNode():
     def __init__(self, node):
@@ -101,9 +102,18 @@ def getRelationshipDict(typeNode):
 
 # ----- NON META METHODS ------ 
 
-def createNode(typeName, name):
+def createNode(typeName, properties):
     typeName = typeName.title()
-    node = Node(typeName, name=name)
+    node = Node(typeName)
+    for prop in properties.keys():
+        if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
+            data = json.dumps(properties[prop])
+            data = data.replace("'", "\\'")
+            data = data.replace('"', '\\"')
+            node[prop] = data
+        else: 
+            properties[prop] = properties[prop].replace("'", "\\'")
+            node[prop] = properties[prop]
     g.create(node)
     return node
 
@@ -120,11 +130,24 @@ def isRelationshipBetweenNodes(nodeFrom, relName, nodeTo):
             return True
     return False
 
-def getNode(typeName, name):
+def getNode(typeName, properties):
     typeName = typeName.title()
-    name = name.replace("'", "\\'")
+    match_string = "MATCH (n:" + typeName + " {"
 
-    match_string = "MATCH (n:" + typeName + " {name:'" + name + "'}) RETURN n LIMIT 100"
+    for prop in properties.keys():
+        if isinstance(properties[prop], dict) or isinstance(properties[prop], list):
+            data = json.dumps(properties[prop])
+            data = data.replace("'", "\\\\\\'")
+            data = data.replace('"', '\\\\\\"')
+            match_string += prop+":'"+data+"', "
+        else:
+            properties[prop] = properties[prop].replace("'", "\\'")
+            match_string += prop+":'"+properties[prop]+"', "
+
+    if len(properties.keys()) > 0:
+        match_string = match_string[:len(match_string)-2] + "}) RETURN n LIMIT 100"
+    else:
+        match_string += "}) RETURN n LIMIT 100"
 
     result = g.cypher.execute(match_string)
     return returnCypherResult(result)
@@ -141,8 +164,8 @@ def getNodesByType(typeName, *props):
     return returnCypherResult(result)
 
 def getOutgoingRels(node):
-    if 'TypeNode' in node.labels:
-        print "This method does not work for TypeNodes"
+    if 'TypeNode' in node.labels or 'RelationshipType' in node.labels:
+        print "This method does not work for TypeNodes or RelationshipTypes"
         return None
     else:
         rels = []
@@ -151,8 +174,8 @@ def getOutgoingRels(node):
         return rels
 
 def getIncomingRels(node):
-    if 'TypeNode' in node.labels:
-        print "This method does not work for TypeNodes"
+    if 'TypeNode' in node.labels or 'RelationshipType' in node.labels:
+        print "This method does not work for TypeNodes or RelationshipTypes"
         return None
     else:
         rels = []

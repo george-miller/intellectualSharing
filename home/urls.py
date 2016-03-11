@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
-
+from tmpviews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode, ViewTypeNode
 from django.contrib import admin
 admin.autodiscover()
 
@@ -9,18 +9,18 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     
     # NON META API
-    url(r'^addNode', views.addNode, name='addNode'),
-    url(r'^addRelationshipBetweenNodes', views.addRelationshipBetweenNodes, name="addRelationshipBetweenNodes"),
-    url(r'^addPropertyToNode', views.addPropertyToNode, name='addPropertyToNode'),
+    url(r'^addNode', AddNode.AddNode.as_view(), name='addNode'),
+    url(r'^addRelationshipBetweenNodes', ConnectNodes.ConnectNodes.as_view(), name="addRelationshipBetweenNodes"),
+    url(r'^addPropertyToNode', AddPropToNode.AddPropToNode.as_view(), name='addPropertyToNode'),
 
     #Node Lookup URL with label and id variables
-    url(r'^viewNode$', views.viewNode, name='viewNode'),
-    url(r'^viewNodeType$', views.viewNodeType, name='viewNodeType'),
+    url(r'^viewNode$', ViewNode.ViewNode.as_view(), name='viewNode'),
+    url(r'^viewTypeNode$', ViewTypeNode.ViewTypeNode.as_view(), name='viewNodeType'),
 
     # META API
     url(r'^typeNodeEditor', views.typeNodeEditor, name='typeNodeEditor'),
-    url(r'^createTypeNode', views.createTypeNode, name='createTypeNode'),
-    url(r'^createRelationshipType', views.createRelationshipType, name='createRelationshipType'),
-    url(r'^connectTypeNodes', views.connectTypeNodes, name='connectTypeNodes'),
-    url(r'^getRelationshipDict', views.getRelationshipDict, name='getRelationshipDict'),
+    url(r'^createTypeNode', CreateTypeNode.CreateTypeNode.as_view(), name='createTypeNode'),
+    url(r'^createRelationshipType', CreateRelationshipType.CreateRelationshipType.as_view(), name='createRelationshipType'),
+    url(r'^connectTypeNodes', ConnectTypeNodes.ConnectTypeNodes.as_view(), name='connectTypeNodes'),
+    url(r'^getRelationshipDict', GetRelationshipDict.GetRelationshipDict.as_view(), name='getRelationshipDict'),
 ]

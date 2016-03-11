@@ -1,14 +1,17 @@
 import testData
 import unittest
+import json
 import requests
 
 class NodeCreate(unittest.TestCase):
 	def runTest(self):
 		self.TestAddNode()
 		self.TestAddRelationshipBetweenNodes()
+		self.TestAddPropertyToNodes()
 
 	def sendAddNodeRequest(self, url, n, expected_code):
-		data = {'typeName': n[0], 'name': n[1]}
+		data = {'typeName': n[0], 'properties': n[1]}
+		data = json.dumps(data)
 		response = requests.post(url, data)
 		self.assertEqual(response.status_code, expected_code)
 
@@ -16,6 +19,7 @@ class NodeCreate(unittest.TestCase):
 		postData = {}
 		for d in data:
 			postData[d[0]] = d[1]
+		postData = json.dumps(postData)
 		response = requests.post(url, postData)
 		self.assertEqual(response.status_code, 400)
 
@@ -29,18 +33,19 @@ class NodeCreate(unittest.TestCase):
 			self.sendAddNodeRequest(url, n, 400)
 		for n in testData.notFoundNodes:
 			self.sendAddNodeRequest(url, n, 404)
-		for data in testData.badAddNodePostData:
-			self.TestBadPostData(url, data)
+		for n in testData.badAddNodePostData:
+			self.TestBadPostData(url, n)
 
 	def sendAddRelRequest(self, url, r, expected_code):
 		data = {
 			'fromType': r[0],
-			'fromName' : r[1],
+			'fromProperties' : r[1],
 			'relName' : r[2],
 			'toType' : r[3],
-			'toName' : r[4]
+			'toProperties' : r[4]
 		}
-		response = requests.post(url, data)
+		d = json.dumps(data)
+		response = requests.post(url, d)
 		self.assertEqual(response.status_code, expected_code)
 
 			
@@ -50,3 +55,16 @@ class NodeCreate(unittest.TestCase):
 		for r in testData.rels:
 			self.sendAddRelRequest(url, r, 201)
 			self.sendAddRelRequest(url, r, 200)
+
+	def TestAddPropertyToNodes(self):
+		url = testData.baseurl + 'addPropertyToNode'
+		self.assertEqual(requests.get(url).status_code, 400)
+		for req in testData.goodAddPropertyToNode:
+			self.sendAddPropRequest(req, url , 201)
+		for req in testData.badAddPropertyToNode:
+			self.sendAddPropRequest(req, url, 400)
+
+	def sendAddPropRequest(self, req, url, expected_code):
+		data = json.dumps(req)
+		response = requests.post(url, data)
+		self.assertEqual(response.status_code, expected_code)

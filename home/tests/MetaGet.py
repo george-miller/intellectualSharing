@@ -31,6 +31,6 @@ class MetaGet(unittest.TestCase):
 			)
 
 	def testGetRelationshipDict(self):
-		response = requests.post(testData.baseurl+'getRelationshipDict', {'typeName': 'Movie'})
+		response = requests.post(testData.baseurl+'getRelationshipDict', json.dumps({'typeName': 'Movie'}))
 		json_response = json.loads(response.text)
 		self.assertDictEqual(json_response, testData.movieRelationshipDict)
