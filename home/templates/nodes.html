@@ -1,0 +1,58 @@
+{% extends "skeleton.html" %}
+{% load home_extras %}
+
+{% block style %}
+<style type="text/css" media="screen">
+    img {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .section {
+        border-bottom: thin solid #bbb;
+        box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'header.html' %}
+
+{% load get_range get_len lookup %}
+
+<div class='row'>
+    <div class="col-xs-12 section">
+        <h2>{{nodeType}}</h2>
+        {% for node in nodes %}
+             <a href="viewNode?typeName={{nodeType}}&name={{node.name}}">{{node.name}}</a><br>
+        {% endfor %}
+    </div>
+
+    <div class="col-xs-12"><br><br></div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    var JSONDATA = {};
+
+    var config = {
+        dataSource: JSONDATA,
+        graphHeight: function(){ return 260; },
+        graphWidth: function(){ return 300; },
+
+        linkDistance: function(){ return 40; },
+
+        nodeTypes: {"node_type": ["Maintainer", "Contributor"]},
+        caption: function(node){ return node.caption; }
+    };
+
+    $(document).ready(function(){
+        alchemy = new Alchemy(config);
+    });
+</script>
+{% endblock %}
