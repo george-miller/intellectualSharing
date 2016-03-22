@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from . import views
-from tmpviews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode, ViewTypeNode
+from classViews import AddNode, ConnectNodes, AddPropToNode, CreateTypeNode, CreateRelationshipType, ConnectTypeNodes, GetRelationshipDict, ViewNode, ViewTypeNode
 from django.contrib import admin
 admin.autodiscover()
 

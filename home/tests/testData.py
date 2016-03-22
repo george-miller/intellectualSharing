@@ -24,6 +24,7 @@ connections = [
 
 # NON-META
 nodes = [
+	('actor', {'name':None, 'dictionary': {'courage': 'Liam Neeson', 'bravery' : None}}),
 	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}),
 	('actor', {'name':'Liam Neeson', 'description': ["Well Liam, you're de\"scriptive", 'Yes you are'], 'dict': {'day':'lovely'}, 'list' : [1, 2, 3, 4, 5]}),
 	('actor', {'name':'Daniel Craig', 'hair': 'blond', 'likes': ['sex', 'blood', '$$$']}),
@@ -71,6 +72,7 @@ rels = [
 	('movie', {'name':'Skyfall'}, 'has_genre', 'genre', {'name':'action'}),
 	('movie', {'name':'Skyfall'}, 'awarded', 'award', {'name':'Tony'}),
 	('actor', {'name':'Liam Neeson', 'dictionary': {'courage': 'Liam Neeson', 'bravery' : 'Liam Neeson'}}, 'had_role', 'role', {'name': 'Liam Neeson in Taken'}),
+	('actor', {'name':'Liam Neeson', 'description': ["Well Liam, you're de\"scriptive", 'Yes you are'], 'dict': {'day':'lovely'}, 'list' : [1, 2, 3, 4, 5]}, 'had_role', 'role', {'name': 'Liam Neeson in Taken'}),
 	('role', {'name': 'Liam Neeson in Taken'}, 'in_production_of', 'movie', {'name':'Taken'}),
 ]
 

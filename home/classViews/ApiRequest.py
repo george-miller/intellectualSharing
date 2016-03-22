@@ -58,6 +58,9 @@ class ApiRequest(View):
 				for innerKey in self.sampleRequest[key]:
 					if innerKey not in self.requestJson[key]:
 						return HttpResponse("You must specify these inner keys: " + str(self.sampleRequest[key]) + " for this key: "+key, status=400)
+				for innerKey in self.requestJson[key].keys():
+					if self.requestJson[key][innerKey] == None:
+						self.requestJson[key][innerKey] = 'None'
 		
 		return None
 
