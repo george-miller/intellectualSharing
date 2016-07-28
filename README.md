@@ -5,7 +5,7 @@ Create and activate a virutual environment in the project root folder (You don't
 
 Install Dependencies:
 ```pip install Django```
-```pip install py2neo```
+```pip install py2neo==2.0```
 
 Install neo4j from their website and start neo4j with:
 ```PATH_TO_NEO4J/bin/neo4j console```
