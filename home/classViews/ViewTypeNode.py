@@ -21,6 +21,9 @@ class ViewTypeNode(GetRequest):
 
 		nodes = db.getNodesByType(typeName)
 		if nodes != []:
-			return render(request, 'nodes.html',{'nodes': nodes, 'nodeType': typeName})
+                        if isinstance(nodes, list):
+			    return render(request, 'nodes.html', {'nodes': nodes, 'nodeType': typeName})
+                        else:
+			    return render(request, 'nodes.html', {'nodes': [nodes], 'nodeType': typeName})
 		else:
 			return HttpResponse(nodeString(typeName, name)+' not found.', status=404)
